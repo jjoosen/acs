@@ -1,0 +1,58 @@
+name: Deploy naar testomgeving
+
+# Push naar de dev-branch (of handmatig) -> build + deploy via SSH/rsync.
+on:
+  push:
+    branches: [claude/admiring-fermat-g5nlss]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-test
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP opzetten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, intl, mbstring, pdo_mysql, gd, zip, xml, fileinfo, exif
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Node opzetten + assets bouwen
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Assets bouwen
+        run: |
+          if [ -f package.json ]; then npm ci && npm run build; fi
+
+      - name: SSH-sleutel laden
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Rsync naar server (nieuwe release)
+        run: |
+          RELEASE="${{ secrets.DEPLOY_PATH }}/releases/$(date +%Y%m%d%H%M%S)"
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "mkdir -p '$RELEASE'"
+          rsync -az --delete \
+            --exclude='.git' --exclude='var' --exclude='node_modules' \
+            --exclude='.env.local' \
+            -e "ssh -i ~/.ssh/id_deploy" \
+            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$RELEASE/"
+
+      - name: Remote deploy-stappen + release activeren
+        run: |
+          ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' RELEASE='${{ env.RELEASE }}' bash -s" < deploy/remote-deploy.sh
