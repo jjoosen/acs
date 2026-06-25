@@ -26,13 +26,8 @@ jobs:
       - name: Composer install
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
-      - name: Node opzetten + assets bouwen
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Assets bouwen
-        run: |
-          if [ -f package.json ]; then npm ci && npm run build; fi
+      # Assets (frontend + admin) zijn voorlopig mee-gecommit in public/build,
+      # dus geen webpack-stap nodig. Voor productie: hier `npm ci && npm run build`.
 
       - name: SSH-sleutel laden
         run: |

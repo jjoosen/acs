@@ -59,5 +59,7 @@ phpstan.neon
 /.twig-cs-fixer.cache
 ###< vincentlanglet/twig-cs-fixer ###
 
-# Build-output (regenereerbaar via asset build / Sulu admin assets)
-/public/build/
+# Build-output: voor de testdeploy committen we de gecompileerde assets mee
+# (frontend + admin), zodat de CI geen webpack-stap nodig heeft. Voor productie
+# wiren we webpack en kan /public/build weer genegeerd worden.
+# /public/build/
