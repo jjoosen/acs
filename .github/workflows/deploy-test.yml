@@ -1,13 +1,12 @@
 name: Deploy naar testomgeving
 
 # Push naar de dev-branch (of handmatig) -> build + deploy via SSH/rsync.
-# Voorlopig handmatig (Actions -> Deploy naar testomgeving -> Run workflow),
-# zodat er geen falende runs zijn vóór de server-secrets bestaan.
-# Zet de push-trigger aan zodra de secrets ingesteld zijn.
+# Push = Combell bijgewerkt. Vereist de 4 server-secrets (SSH_HOST, SSH_USER,
+# SSH_KEY, DEPLOY_PATH) in repo -> Settings -> Secrets -> Actions.
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [claude/admiring-fermat-g5nlss]
+  push:
+    branches: [claude/beautiful-wright-y6i7cr]
 
 concurrency:
   group: deploy-test
