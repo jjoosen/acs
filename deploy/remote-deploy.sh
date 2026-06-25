@@ -61,12 +61,14 @@ $PHP bin/console cache:clear
 $PHP bin/console cache:warmup
 chmod -R 775 var || true
 
-# Combell-docroot is de symlink 'www' (wijst nu naar de oude site). Laten
-# wijzen naar onze public/, zodat het domein onze Sulu-app serveert.
-WWW="$(dirname "$DEPLOY_PATH")/www"
+# Combell-docroot is de symlink 'www' in de home-map. Die naar onze public/
+# laten wijzen (absoluut pad), zodat het domein onze Sulu-app serveert.
+# (DEPLOY_PATH kan relatief zijn; $(pwd) is hier het absolute projectpad.)
+APP_DIR="$(pwd)"
+WWW="${HOME:-$(dirname "$APP_DIR")}/www"
 if [ -L "$WWW" ] || [ ! -e "$WWW" ]; then
-  ln -sfn "$DEPLOY_PATH/public" "$WWW"
-  echo "Docroot symlink: $WWW -> $DEPLOY_PATH/public"
+  ln -sfn "$APP_DIR/public" "$WWW"
+  echo "Docroot symlink: $WWW -> $APP_DIR/public"
 elif [ -d "$WWW" ]; then
   echo "LET OP: $WWW is een echte map (geen symlink). Niet aangepast — handmatig nodig."
 fi
