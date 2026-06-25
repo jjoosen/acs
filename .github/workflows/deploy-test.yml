@@ -51,4 +51,4 @@ jobs:
       - name: Remote deploy-stappen (migraties, seed, cache)
         run: |
           ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" < deploy/remote-deploy.sh
+            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh
