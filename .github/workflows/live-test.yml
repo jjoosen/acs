@@ -1,0 +1,90 @@
+name: Live test (tijdelijke publieke URL)
+
+# Start de VOLLEDIGE Sulu (admin + frontend) in de Actions-runner en maakt die
+# tijdelijk publiek bereikbaar via een Cloudflare quick-tunnel.
+# Handmatig starten: Actions -> "Live test" -> Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: 'Hoe lang de site online blijft (minuten)'
+        required: true
+        default: '60'
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      APP_ENV: dev
+      APP_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP opzetten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, intl, mbstring, pdo_sqlite, gd, zip, xml, fileinfo, exif
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --optimize-autoloader --no-interaction --no-progress
+
+      - name: Omgeving + content klaarzetten (SQLite, uit seed)
+        run: |
+          mkdir -p var
+          cp deploy/seed/legacy.db var/legacy.db
+          cat > .env.local <<'ENV'
+          APP_ENV=dev
+          APP_DEBUG=0
+          DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"
+          ENV
+          php bin/console cache:clear
+          php bin/console doctrine:schema:create -n
+          php bin/console doctrine:phpcr:init:dbal --if-not-exists || true
+          php bin/console sulu:document:initialize -n
+          php bin/console app:migrate --source-dsn="pdo-sqlite:///$(pwd)/var/legacy.db"
+          php bin/console sulu:security:role:create Administrator Sulu || true
+          php bin/console sulu:security:user:create admin Beheerder Beheerder admin@acs.be en Administrator 'AcsAdmin2026!' || true
+          php bin/console cache:clear
+
+      - name: PHP-server starten
+        run: |
+          export PHP_CLI_SERVER_WORKERS=6
+          nohup php -S 0.0.0.0:8000 -t public deploy/server-router.php > php-server.log 2>&1 &
+          sleep 3
+          curl -s -o /dev/null -w "lokale check: HTTP %{http_code}\n" http://127.0.0.1:8000/
+
+      - name: Cloudflare-tunnel starten + URL tonen
+        run: |
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+          nohup ./cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8000 > tunnel.log 2>&1 &
+          echo "Wachten op publieke URL..."
+          URL=""
+          for i in $(seq 1 30); do
+            URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' tunnel.log | head -1 || true)
+            [ -n "$URL" ] && break
+            sleep 2
+          done
+          if [ -z "$URL" ]; then echo "Geen tunnel-URL gevonden"; cat tunnel.log; exit 1; fi
+          {
+            echo "## 🌐 Live test-URL"
+            echo ""
+            echo "**Frontend:** $URL/"
+            echo ""
+            echo "**Sulu admin:** $URL/admin   (login: \`admin\` / \`AcsAdmin2026!\`)"
+            echo ""
+            echo "Online voor ~${{ github.event.inputs.minutes }} minuten."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "=================================================="
+          echo " FRONTEND : $URL/"
+          echo " ADMIN    : $URL/admin   (admin / AcsAdmin2026!)"
+          echo "=================================================="
+
+      - name: Online houden
+        run: |
+          MIN="${{ github.event.inputs.minutes }}"
+          echo "Site blijft ${MIN} minuten online..."
+          sleep $(( MIN * 60 ))
