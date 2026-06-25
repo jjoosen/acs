@@ -24,7 +24,7 @@ jobs:
       - name: PHP opzetten
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: ctype, iconv, intl, mbstring, pdo_sqlite, gd, zip, xml, fileinfo, exif
           tools: composer:v2
 
