@@ -69,7 +69,7 @@ final class TranslateCommand extends Command
             $source
         );
         /** @var object[] $docs */
-        $docs = $query->execute();
+        $docs = \iterator_to_array($query->execute());
         if ($limit > 0) {
             $docs = \array_slice($docs, 0, $limit);
         }
