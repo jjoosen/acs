@@ -32,37 +32,53 @@ jobs:
       # Assets (frontend + admin) zijn voorlopig mee-gecommit in public/build,
       # dus geen webpack-stap nodig. Voor productie: hier `npm ci && npm run build`.
 
-      - name: SSH-sleutel laden
+      - name: SSH voorbereiden (wachtwoord of sleutel)
         run: |
           mkdir -p ~/.ssh
-          KEY="${{ secrets.SSH_KEY }}"
-          # Probeer eerst base64 te decoderen (bulletproof tegen witruimte/CRLF/plakken);
-          # val anders terug op platte tekst (CR gestript).
-          if printf '%s' "$KEY" | tr -d '[:space:]' | base64 -d > ~/.ssh/id_deploy 2>/dev/null \
-               && head -1 ~/.ssh/id_deploy | grep -q "PRIVATE KEY"; then
-            echo "Sleutel via base64 gedecodeerd."
-          else
-            printf '%s\n' "$KEY" | tr -d '\r' > ~/.ssh/id_deploy
-            echo "Sleutel als platte tekst geschreven."
-          fi
-          chmod 600 ~/.ssh/id_deploy
-          if ssh-keygen -y -f ~/.ssh/id_deploy >/dev/null 2>&1; then
-            echo "✓ Privé-sleutel is geldig."
-          else
-            echo "!! Privé-sleutel ONGELDIG — controleer de SSH_KEY secret."
-          fi
           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            echo "Auth-methode: wachtwoord (sshpass)."
+            sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+          else
+            echo "Auth-methode: privé-sleutel."
+            KEY="${{ secrets.SSH_KEY }}"
+            if printf '%s' "$KEY" | tr -d '[:space:]' | base64 -d > ~/.ssh/id_deploy 2>/dev/null \
+                 && head -1 ~/.ssh/id_deploy | grep -q "PRIVATE KEY"; then
+              echo "Sleutel via base64 gedecodeerd."
+            else
+              printf '%s\n' "$KEY" | tr -d '\r' > ~/.ssh/id_deploy
+              echo "Sleutel als platte tekst geschreven."
+            fi
+            chmod 600 ~/.ssh/id_deploy
+            ssh-keygen -y -f ~/.ssh/id_deploy >/dev/null 2>&1 \
+              && echo "✓ Privé-sleutel is geldig." \
+              || echo "!! Privé-sleutel ONGELDIG — controleer de SSH_KEY secret."
+          fi
 
       - name: Rsync naar server (in-place in de docroot)
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
         run: |
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
+          else
+            RSH="ssh -i ~/.ssh/id_deploy"
+          fi
           rsync -az --delete \
             --exclude='.git' --exclude='node_modules' \
             --exclude='var' --exclude='.env.local' \
             --exclude='upload' --exclude='public/uploads' \
-            -e "ssh -i ~/.ssh/id_deploy" \
+            -e "$RSH" \
             ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/"
 
       - name: Remote deploy-stappen (migraties, seed, cache)
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
         run: |
-          ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
+          else
+            RSH="ssh -i ~/.ssh/id_deploy"
+          fi
+          $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh
