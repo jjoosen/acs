@@ -1,0 +1,34 @@
+== 1) Pagina-render-check (366 URLs) ==
+  OK: 366   NIET-200: 0
+
+== 2) Interne links controleren (393 uniek) ==
+  OK: 392   GEBROKEN: 1
+    [404] /acs-connect-uw-digitaal-platform
+
+== Samenvatting overige links ==
+  Externe links      : 209
+  Media-links (/upload): 0  (komen pas live met de upload-map)
+  mailto:            : 8
+  tel:               : 0
+
+-- Externe links (top 20) --
+    https://www.acsac.eu/duurzaam-ondernemen-1
+    https://www.innomedio.be
+    https://www.acs.be/privacy-policy
+    https://support.google.com/accounts/answer/32050
+    https://support.apple.com/en-in/guide/safari/sfri11471/mac
+    https://support.mozilla.org/en-US/kb/clear-cookies-and-site-data-firefox?redirectslug=delete-cookies-remove-info-websites-stored&amp;redirectlocale=en-US
+    https://support.microsoft.com/en-us/topic/how-to-delete-cookie-files-in-internet-explorer-bca9446f-d873-78de-77ba-d42645fa52fc
+    https://www.acsac.eu/nieuws/ac-s-plant-eigen-bedrijfsbos
+    https://www.acs.be/nieuws/verplichte-elektronische-facturatie-vanaf-2026-wat-kan-je-nu-al-doen
+    https://kmoconnect.io/peppol/#:~:text=Zijn%20de%20kosten%20aftrekbaar%3F
+    https://etl-global.com/
+    https://www.premierinternational.org/
+    https://www.acs.be/kerncijfers#block-1612
+    https://www.acsac.eu/nieuws/groene-mobiliteit-weg-met-de-aftrek-voor-diesel-benzinewagens
+    https://www.acsac.eu/nieuws/btw-aan-verkoop-tweedehands-wagen
+    https://www.acsac.eu/nieuws/elektrische-of-hybride-bedrijfswagen-is-de-terugbetaling-van-elektriciteit-belastbaar
+    https://www.made-in.be/nativo/?ntv_acpl=1208458&amp;ntv_acsc=0&amp;ntv_ht=9ekTZQA&amp;ntv_ot=0&amp;ntv_ui=e3b1fe0a-a2cd-4366-9754-04777806561d&amp;prx_t=aKEIA7-RhAinASA
+    https://www.acs.be/nieuws/huurindexatie-vanaf-nu-afhankelijk-van-uw-energiescore
+    https://www.cdenv.be/minister_van_peteghem_stimuleert_betaalbare_huurwoningen
+    https://www.acs.be/nieuws/afbraak-en-heropbouw-aan-6-btw-veranderingen-vanaf-1-januari-2024
