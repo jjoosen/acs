@@ -8,6 +8,8 @@
 
     <localizations>
         <localization language="nl" default="true"/>
+        <localization language="fr"/>
+        <localization language="en"/>
     </localizations>
 
     <default-templates>
@@ -43,11 +45,15 @@
                 <environment type="prod">
                     <urls>
                         <url language="nl">{host}</url>
+                        <url language="fr">{host}/fr</url>
+                        <url language="en">{host}/en</url>
                     </urls>
                 </environment>
                 <environment type="dev">
                     <urls>
                         <url language="nl">{host}</url>
+                        <url language="fr">{host}/fr</url>
+                        <url language="en">{host}/en</url>
                     </urls>
                 </environment>
             </environments>

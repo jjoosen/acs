@@ -29,15 +29,24 @@ export APP_ENV=prod
 # Root-.htaccess plaatsen (alles via public/).
 cp -f deploy/htaccess-docroot .htaccess
 
-# Nog niet (volledig) geseed? Begin met een schone database, zodat een eerdere
-# half-afgebroken seed (bv. door SSH-timeout) geen dubbele content geeft.
-if [ ! -f var/.seeded ]; then
+# Reseed-beslissing: opnieuw seeden bij een nieuwe deploy/seed/VERSION
+# (bv. na migratie-wijzigingen zoals menu's) of als er nog niets staat.
+SEED_VER="$(cat deploy/seed/VERSION 2>/dev/null || echo 1)"
+CUR_VER="$(cat var/.seed-version 2>/dev/null || echo 0)"
+RESEED=0
+if [ "$SEED_VER" != "$CUR_VER" ] || [ ! -f var/.seeded ]; then
+  RESEED=1
+  # Schone database voor een nette (her)seed (geen dubbele content).
   rm -f var/data.db
 fi
 
-# Schema + PHPCR + home (idempotent; maakt op een verse SQLite alles aan).
+# Schema + PHPCR. De live-workspace (default_live) is nodig voor meertaligheid
+# en publiceren; maak ze aan en wis daarna de PHPCR-cache (anders blijft een
+# "root niet gevonden" gecachet en faalt document:initialize).
 $PHP bin/console doctrine:schema:update --force -n
 $PHP bin/console doctrine:phpcr:init:dbal --if-not-exists || true
+$PHP bin/console doctrine:phpcr:workspace:create default_live 2>/dev/null || true
+rm -rf var/cache/* 2>/dev/null || true
 $PHP bin/console sulu:document:initialize -n
 
 # Admin VÓÓR de migratie aanmaken: zo kun je meteen inloggen, ook als de
@@ -45,16 +54,16 @@ $PHP bin/console sulu:document:initialize -n
 $PHP bin/console sulu:security:role:create Administrator Sulu || true
 $PHP bin/console sulu:security:user:create admin Beheerder Beheerder admin@acs.be en Administrator "${ADMIN_PASSWORD:-AcsAdmin2026!}" || true
 
-# Eenmalig content seeden (marker var/.seeded).
-if [ ! -f var/.seeded ]; then
-  echo "Content seeden ..."
+if [ "$RESEED" = "1" ]; then
+  echo "Content (her)seeden: versie $CUR_VER -> $SEED_VER ..."
   cp -f deploy/seed/legacy.db var/seed.db
   SEED="$(pwd)/var/seed.db"
   $PHP bin/console app:migrate --source-dsn="pdo-sqlite:///$SEED"
+  echo "$SEED_VER" > var/.seed-version
   touch var/.seeded
-  echo "Seed voltooid."
+  echo "Seed voltooid (versie $SEED_VER)."
 else
-  echo "Al geseed (var/.seeded aanwezig) — content ongemoeid gelaten."
+  echo "Geen reseed nodig (seed-versie $CUR_VER)."
 fi
 
 $PHP bin/console cache:clear

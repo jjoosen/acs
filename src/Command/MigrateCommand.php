@@ -96,6 +96,10 @@ final class MigrateCommand extends Command
         }
         $io->writeln(\sprintf('%d pagina\'s (met nl-vertaling) gevonden.', \count($pages)));
 
+        // legacy page.id => Sulu navigatie-contexten (main / footer), uit de
+        // legacy 'navigation'-tabel, zodat de menu's gevuld worden.
+        $navContexts = $this->loadNavContexts($source);
+
         $homeUuid = $this->documentManager->find(self::HOME_PATH, self::LOCALE)->getUuid();
 
         // legacy page.id => Sulu document-UUID (voor parent-koppeling). We houden
@@ -140,6 +144,9 @@ final class MigrateCommand extends Command
                 $doc->setWorkflowStage(
                     1 === (int) $row['active'] ? WorkflowStage::PUBLISHED : WorkflowStage::TEST
                 );
+                if (!$isHome) {
+                    $doc->setNavigationContexts($navContexts[$legacyId] ?? []);
+                }
 
                 $doc->getStructure()->bind([
                     'title' => $title,
@@ -178,12 +185,132 @@ final class MigrateCommand extends Command
             $io->writeln(\sprintf('  %-22s %d', $tag, $n));
         }
 
+        if (!$dryRun) {
+            $navCount = $this->exportNavigation($source);
+            $io->writeln(\sprintf('Navigatie geëxporteerd: %d menu-items naar var/navigation.json', $navCount));
+        }
+
         $io->success(\sprintf(
             '%d aangemaakt, %d bijgewerkt (home), %d overgeslagen.',
             $created, $updated, $skipped
         ));
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Exporteert de legacy 'navigation'-structuur (per tag, met sub-items en
+     * URL's) naar var/navigation.json, zodat de Twig-functie navigation() de
+     * menu's (header/footer) exact zoals de oude site kan renderen.
+     */
+    private function exportNavigation(Connection $source): int
+    {
+        // page_id => [name, url] (nl)
+        $pages = [];
+        foreach ($source->executeQuery(
+            'SELECT p.id, p.homepage, t.name, t.url, t.full_slug
+             FROM page p INNER JOIN page_translation t ON t.page_id = p.id AND t.language_id = :loc',
+            ['loc' => self::LOCALE]
+        )->fetchAllAssociative() as $r) {
+            $pages[(int) $r['id']] = [
+                'name' => \trim((string) ($r['name'] ?? '')),
+                'url' => 1 === (int) $r['homepage'] ? '/' : $this->resolveUrl($r),
+            ];
+        }
+
+        $navRows = $source->executeQuery(
+            'SELECT n.id, n.page_id, n.parent_id, n.tag, n.custom_tag, n.sort_order,
+                    nt.name AS nav_name, nt.custom_url
+             FROM navigation n
+             LEFT JOIN navigation_translation nt
+                    ON nt.navigation_id = n.id AND nt.language_id = :loc
+             WHERE n.active = 1
+             ORDER BY n.sort_order ASC',
+            ['loc' => self::LOCALE]
+        )->fetchAllAssociative();
+
+        $byId = [];
+        foreach ($navRows as $r) {
+            $pid = (int) ($r['page_id'] ?? 0);
+            $page = $pages[$pid] ?? null;
+            $name = \trim((string) ($r['nav_name'] ?? '')) ?: ($page['name'] ?? '');
+            $url = \trim((string) ($r['custom_url'] ?? '')) ?: ($page['url'] ?? '#');
+            $byId[(int) $r['id']] = [
+                'id' => (int) $r['id'],
+                'parent' => null !== $r['parent_id'] ? (int) $r['parent_id'] : null,
+                'group' => (string) $r['tag'],
+                'tag' => (string) ($r['custom_tag'] ?? ''),
+                'name' => $name,
+                'url' => $url,
+            ];
+        }
+
+        $childrenOf = [];
+        $tops = [];
+        foreach ($byId as $node) {
+            if (null !== $node['parent'] && isset($byId[$node['parent']])) {
+                $childrenOf[$node['parent']][] = $node['id'];
+            } else {
+                $tops[$node['group']][] = $node['id'];
+            }
+        }
+
+        $build = function (int $id) use (&$build, $byId, $childrenOf): array {
+            $n = $byId[$id];
+            $kids = $childrenOf[$id] ?? [];
+            $n['children'] = \array_map($build, $kids);
+            unset($n['parent'], $n['id'], $n['group']);
+
+            return $n;
+        };
+
+        $out = [];
+        foreach ($tops as $group => $ids) {
+            $out[$group] = \array_map($build, $ids);
+        }
+        $count = \count($byId);
+
+        $path = \dirname(__DIR__, 2) . '/var/navigation.json';
+        \file_put_contents($path, \json_encode($out, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES));
+
+        return $count;
+    }
+
+    /**
+     * Leest de legacy 'navigation'-tabel en mapt elke page_id op Sulu
+     * navigatie-contexten: tag 'main' -> 'main', 'footer*'/'top' -> 'footer'.
+     *
+     * @return array<int, list<string>>
+     */
+    private function loadNavContexts(Connection $source): array
+    {
+        $map = [];
+        try {
+            $rows = $source->executeQuery(
+                'SELECT page_id, tag FROM navigation WHERE active = 1 AND page_id IS NOT NULL'
+            )->fetchAllAssociative();
+        } catch (\Throwable $e) {
+            return $map;
+        }
+        foreach ($rows as $row) {
+            $pid = (int) $row['page_id'];
+            $tag = (string) ($row['tag'] ?? '');
+            $ctx = null;
+            if ('main' === $tag) {
+                $ctx = 'main';
+            } elseif (\str_starts_with($tag, 'footer') || 'top' === $tag) {
+                $ctx = 'footer';
+            }
+            if (null === $ctx) {
+                continue;
+            }
+            $map[$pid] ??= [];
+            if (!\in_array($ctx, $map[$pid], true)) {
+                $map[$pid][] = $ctx;
+            }
+        }
+
+        return $map;
     }
 
     /**

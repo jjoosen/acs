@@ -90,16 +90,29 @@ final class LegacyCompatExtension extends AbstractExtension
     }
 
     /**
+     * @var array<string, array<int, mixed>>|null in-memory cache van var/navigation.json
+     */
+    private ?array $navData = null;
+
+    /**
      * Legacy: navigation(tag, withChildren, onlyActive) -> lijst nav-items.
      *
-     * Wordt aangesloten op Sulu navigation-contexts (main/footer). Tot dan een
-     * lege lijst zodat header/footer renderen zonder menu-items.
+     * Leest de door de migratie geëxporteerde menustructuur uit
+     * var/navigation.json (gegroepeerd per legacy-tag: main/top/footer1/2/3...).
+     * Elk item heeft: name, url, tag (custom_tag, bv. button/jobs), children.
      *
      * @return array<int, mixed>
      */
     public function navigation(string $tag, bool $withChildren = true, bool $onlyActive = true): array
     {
-        return [];
+        if (null === $this->navData) {
+            $path = \dirname(__DIR__, 2) . '/var/navigation.json';
+            $this->navData = \is_file($path)
+                ? (json_decode((string) file_get_contents($path), true) ?: [])
+                : [];
+        }
+
+        return $this->navData[$tag] ?? [];
     }
 
     /** Legacy: view_file_link(id) -> download/preview-URL. Stub tot media-import. */
