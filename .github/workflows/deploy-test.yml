@@ -93,11 +93,14 @@ jobs:
           echo "Healthcheck op $BASE"
           for path in "/" "/admin/" "/build/css/app.css" "/onze-expertise"; do
             code=$(curl -k -s -o /tmp/body -w "%{http_code}" -L --max-time 30 "$BASE$path" || echo "000")
-            echo ">>> $BASE$path -> HTTP $code  ($(head -c 60 /tmp/body | tr -d '\n'))"
+            echo ">>> $BASE$path -> HTTP $code  (bytes=$(wc -c < /tmp/body))"
             if [ "$code" != "200" ] && [ "$code" != "302" ]; then
               echo "--- eerste 800 tekens response ---"; head -c 800 /tmp/body; echo; echo "---"
             fi
           done
+          echo "===== VOLLEDIGE HOMEPAGE-HTML ====="
+          curl -k -s -L --max-time 30 "$BASE/" | head -c 4000
+          echo; echo "===== EINDE HOMEPAGE ====="
           # Ook server-side checken (logs + php-versie), onafhankelijk van DNS.
           if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
             RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
