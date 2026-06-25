@@ -91,11 +91,11 @@ jobs:
           BASE="${{ secrets.SITE_URL }}"
           if [ -z "$BASE" ]; then BASE="https://goldeneye.digital"; fi
           echo "Healthcheck op $BASE"
-          for path in "/" "/admin/"; do
+          for path in "/" "/admin/" "/build/css/app.css" "/onze-expertise"; do
             code=$(curl -k -s -o /tmp/body -w "%{http_code}" -L --max-time 30 "$BASE$path" || echo "000")
-            echo ">>> $BASE$path -> HTTP $code"
+            echo ">>> $BASE$path -> HTTP $code  ($(head -c 60 /tmp/body | tr -d '\n'))"
             if [ "$code" != "200" ] && [ "$code" != "302" ]; then
-              echo "--- eerste 1200 tekens response ---"; head -c 1200 /tmp/body; echo; echo "---"
+              echo "--- eerste 800 tekens response ---"; head -c 800 /tmp/body; echo; echo "---"
             fi
           done
           # Ook server-side checken (logs + php-versie), onafhankelijk van DNS.
