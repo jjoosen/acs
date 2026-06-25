@@ -8,6 +8,10 @@ on:
         description: 'Doeltaal (fr of en)'
         required: true
         default: 'fr'
+      limit:
+        description: 'Max pagina''s (0 = alles; klein houden zonder DeepL-sleutel)'
+        required: false
+        default: '10'
 
 concurrency:
   group: translate
@@ -33,14 +37,14 @@ jobs:
         run: |
           RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=120"
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' DEEPL_API_KEY='${{ secrets.DEEPL_API_KEY }}' LOCALE='${{ github.event.inputs.locale }}' bash -s" <<'EOF'
+            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' DEEPL_API_KEY='${{ secrets.DEEPL_API_KEY }}' LOCALE='${{ github.event.inputs.locale }}' LIMIT='${{ github.event.inputs.limit }}' bash -s" <<'EOF'
           set -e
           cd "$DEPLOY_PATH"
           PHP="${PHP_BIN:-php}"
           export APP_ENV=prod
           export DEEPL_API_KEY
-          echo "Vertalen naar: $LOCALE"
-          $PHP bin/console app:translate "$LOCALE" --source=nl
+          echo "Vertalen naar: $LOCALE (limit=${LIMIT:-10})"
+          $PHP bin/console app:translate "$LOCALE" --source=nl --limit="${LIMIT:-10}"
           $PHP bin/console cache:clear
           echo "Klaar met vertalen naar $LOCALE."
           EOF
