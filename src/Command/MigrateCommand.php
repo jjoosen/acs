@@ -324,6 +324,10 @@ final class MigrateCommand extends Command
      */
     private function mapBlocks(Connection $source, int $pageId, array &$stats): array
     {
+        // Primair: actieve root-blokken. Sommige pagina's hebben hun content
+        // echter in active=0/tag=null blokken (export-eigenaardigheid); val daar
+        // op terug als er geen actieve blokken zijn, zodat die pagina's niet leeg
+        // blijven (bv. /profielen/ondernemer).
         $rows = $source->executeQuery(
             'SELECT tag, fields FROM page_block
              WHERE page_id = :pid AND parent_id IS NULL AND active = 1
@@ -331,16 +335,31 @@ final class MigrateCommand extends Command
             ['pid' => $pageId]
         )->fetchAllAssociative();
 
+        if ([] === $rows) {
+            $rows = $source->executeQuery(
+                'SELECT tag, fields FROM page_block
+                 WHERE page_id = :pid AND parent_id IS NULL
+                 ORDER BY sort_order ASC',
+                ['pid' => $pageId]
+            )->fetchAllAssociative();
+        }
+
         $blocks = [];
         foreach ($rows as $row) {
-            $tag = (string) $row['tag'];
+            $tag = \trim((string) ($row['tag'] ?? ''));
+            $fields = $this->unserializeFields($row['fields'] ?? null);
+
+            // Tag leeg maar met tekst -> behandel als 'text'-blok.
+            if ('' === $tag && '' !== \trim((string) ($fields['text'] ?? ''))) {
+                $tag = 'text';
+            }
+
             $type = self::BLOCK_MAP[$tag] ?? null;
             $stats[$tag ?: '(leeg)'] = ($stats[$tag ?: '(leeg)'] ?? 0) + 1;
             if (null === $type) {
                 continue; // bloktype nog niet geport
             }
 
-            $fields = $this->unserializeFields($row['fields'] ?? null);
             $block = ['type' => $type];
             foreach ($fields as $key => $value) {
                 if (\is_array($value)) {
