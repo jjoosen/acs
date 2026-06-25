@@ -35,9 +35,12 @@ jobs:
       - name: SSH-sleutel laden
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_deploy
+          # printf + CR-strippen: voorkomt "error in libcrypto" door CRLF/Windows-klembord.
+          printf '%s\n' "${{ secrets.SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "Sleutel-validatie (publieke afgeleide moet in authorized_keys staan):"
+          ssh-keygen -y -f ~/.ssh/id_deploy || echo "!! Privé-sleutel ongeldig — controleer de SSH_KEY secret."
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Rsync naar server (in-place in de docroot)
         run: |
