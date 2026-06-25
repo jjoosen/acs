@@ -96,10 +96,12 @@ final class MigrateCommand extends Command
         }
         $io->writeln(\sprintf('%d pagina\'s (met nl-vertaling) gevonden.', \count($pages)));
 
-        $homeDocument = $this->documentManager->find(self::HOME_PATH, self::LOCALE);
+        $homeUuid = $this->documentManager->find(self::HOME_PATH, self::LOCALE)->getUuid();
 
-        // legacy page.id => Sulu document (voor parent-koppeling).
-        $idToDoc = [];
+        // legacy page.id => Sulu document-UUID (voor parent-koppeling). We houden
+        // UUID's bij i.p.v. document-objecten, zodat een documentManager->clear()
+        // bij een fout de parent-koppeling niet kapotmaakt.
+        $idToUuid = [];
         $created = 0;
         $updated = 0;
         $skipped = 0;
@@ -124,15 +126,14 @@ final class MigrateCommand extends Command
 
             try {
                 if ($isHome) {
-                    /** @var \Sulu\Component\Content\Document\Behavior\StructureBehavior $doc */
-                    $doc = $homeDocument;
+                    $doc = $this->documentManager->find($homeUuid, self::LOCALE);
                     $doc->setTitle($title);
                 } else {
                     $doc = $this->documentManager->create('page');
                     $doc->setTitle($title);
                     $doc->setResourceSegment($slug);
-                    $parent = $idToDoc[(int) $row['parent_id']] ?? $homeDocument;
-                    $doc->setParent($parent);
+                    $parentUuid = $idToUuid[(int) $row['parent_id']] ?? $homeUuid;
+                    $doc->setParent($this->documentManager->find($parentUuid, self::LOCALE));
                 }
 
                 $doc->setStructureType('content');
@@ -153,21 +154,18 @@ final class MigrateCommand extends Command
                     ],
                 ]);
 
-                $this->documentManager->persist($doc, self::LOCALE, [
-                    'parent_path' => self::HOME_PATH,
-                ]);
+                $this->documentManager->persist($doc, self::LOCALE);
                 if (1 === (int) $row['active']) {
                     $this->documentManager->publish($doc, self::LOCALE);
                 }
                 $this->documentManager->flush();
 
-                $idToDoc[$legacyId] = $doc;
+                $idToUuid[$legacyId] = $doc->getUuid();
                 $isHome ? $updated++ : $created++;
             } catch (\Throwable $e) {
                 ++$skipped;
                 $io->writeln(\sprintf('  ! overslaan [%d] %s: %s', $legacyId, $title, $e->getMessage()));
                 $this->documentManager->clear();
-                $homeDocument = $this->documentManager->find(self::HOME_PATH, self::LOCALE);
             }
         }
 

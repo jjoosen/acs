@@ -2,7 +2,10 @@ when@prod: &prod
     sulu_http_cache:
         proxy_client:
             symfony:
-                enabled: true # disable this when varnish is used
+                # Uitgezet voor de testomgeving: automatische cache-invalidatie bij
+                # publish vereist een request-context en faalt in CLI (app:migrate).
+                # Voor productie met Varnish/proxy weer aanzetten.
+                enabled: false # disable this when varnish is used
 
     # Varnish Configuration:
     #
