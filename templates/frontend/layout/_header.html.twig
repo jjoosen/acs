@@ -60,6 +60,18 @@
             {% endif %}
         </a>
 
+        {# Taalswitch (NL/FR/EN) — Sulu meertaligheid #}
+        {% set _locales = {'nl': '/', 'fr': '/fr', 'en': '/en'} %}
+        <ul class="lang-switch list-unstyled d-flex align-items-center mb-0 mr-2 mr-lg-3" style="gap:.5rem;">
+            {% for code, base in _locales %}
+                <li>
+                    <a href="{{ base }}"
+                       class="lang-switch__link text-uppercase {% if app.request.locale == code %}is-active font-weight-bold{% endif %}"
+                       hreflang="{{ code }}">{{ code }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+
         {% if main_nav %}
             <nav class="{% if transparentNav %}main-nav-trans {% else %} main-nav {% endif %}d-none d-lg-block">
                 <ul class="{% if transparentNav %}main-nav-trans__list  {% else %} main-nav__list {% endif %}list-unstyled">

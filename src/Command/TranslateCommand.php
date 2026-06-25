@@ -53,11 +53,8 @@ final class TranslateCommand extends Command
         $limit = (int) $input->getOption('limit');
         $overwrite = (bool) $input->getOption('overwrite');
 
-        if ('' === $this->deeplApiKey) {
-            $io->error('DEEPL_API_KEY ontbreekt. Stel die in als environment-variabele/secret.');
-
-            return Command::FAILURE;
-        }
+        $provider = '' !== $this->deeplApiKey ? 'DeepL' : 'MyMemory (gratis, zonder sleutel)';
+        $io->writeln('Vertaalprovider: ' . $provider);
         if ($target === $source) {
             $io->error('Doeltaal mag niet gelijk zijn aan brontaal.');
 
@@ -190,14 +187,26 @@ final class TranslateCommand extends Command
             return $this->cache[$ck];
         }
 
+        try {
+            $out = '' !== $this->deeplApiKey
+                ? $this->translateDeepl($text, $source, $target)
+                : $this->translateMyMemory($text, $source, $target);
+        } catch (\Throwable $e) {
+            $out = $text; // bij API-fout: origineel behouden
+        }
+        $this->cache[$ck] = $out;
+
+        return $out;
+    }
+
+    private function translateDeepl(string $text, string $source, string $target): string
+    {
         $host = \str_ends_with($this->deeplApiKey, ':fx')
             ? 'https://api-free.deepl.com'
             : 'https://api.deepl.com';
 
         $resp = $this->httpClient->request('POST', $host . '/v2/translate', [
-            'headers' => [
-                'Authorization' => 'DeepL-Auth-Key ' . $this->deeplApiKey,
-            ],
+            'headers' => ['Authorization' => 'DeepL-Auth-Key ' . $this->deeplApiKey],
             'body' => [
                 'text' => $text,
                 'source_lang' => \strtoupper($source),
@@ -206,10 +215,41 @@ final class TranslateCommand extends Command
             ],
             'timeout' => 30,
         ]);
-        $json = $resp->toArray(false);
-        $out = (string) ($json['translations'][0]['text'] ?? $text);
-        $this->cache[$ck] = $out;
 
-        return $out;
+        return (string) ($resp->toArray(false)['translations'][0]['text'] ?? $text);
+    }
+
+    /** Gratis fallback zonder sleutel (anoniem ~5000 woorden/dag, max ~500 tekens/call). */
+    private function translateMyMemory(string $text, string $source, string $target): string
+    {
+        // Lange teksten in stukken (MyMemory-limiet ~500 tekens), op zinsgrenzen.
+        if (\mb_strlen($text) > 480) {
+            $parts = \preg_split('/(?<=[.!?])\s+/u', $text) ?: [$text];
+            $buf = '';
+            $out = '';
+            foreach ($parts as $p) {
+                if (\mb_strlen($buf . ' ' . $p) > 480) {
+                    $out .= $this->translateMyMemory($buf, $source, $target) . ' ';
+                    $buf = $p;
+                } else {
+                    $buf = '' === $buf ? $p : $buf . ' ' . $p;
+                }
+            }
+            if ('' !== $buf) {
+                $out .= $this->translateMyMemory($buf, $source, $target);
+            }
+
+            return \trim($out);
+        }
+
+        $resp = $this->httpClient->request('GET', 'https://api.mymemory.translated.net/get', [
+            'query' => [
+                'q' => $text,
+                'langpair' => \strtolower($source) . '|' . \strtolower($target),
+            ],
+            'timeout' => 30,
+        ]);
+
+        return (string) ($resp->toArray(false)['responseData']['translatedText'] ?? $text);
     }
 }
