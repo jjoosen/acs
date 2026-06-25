@@ -1,0 +1,7 @@
+# Combell-webhosting (vaste docroot): stuur alle requests via public/.
+# De volledige app staat in de docroot; door alles te prefixen met public/
+# zijn config/, src/, vendor/ niet rechtstreeks bereikbaar.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

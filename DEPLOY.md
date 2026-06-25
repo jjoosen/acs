@@ -1,9 +1,17 @@
-# Deploy naar de testomgeving
+# Deploy naar de testomgeving (Combell webhosting, vaste docroot)
 
 Deze sandbox kan niet rechtstreeks naar een server (uitgaand SSH/HTTP geblokkeerd).
 De deploy gebeurt daarom via **GitHub Actions**: een push naar de branch bouwt
 het project en zet het via SSH/rsync op de testserver. Resultaat: *git push =
 testomgeving bijgewerkt*.
+
+**Model voor Combell-webhosting (vaste docroot):** de volledige app wordt
+*in-place* in de docroot (`DEPLOY_PATH`) gersynct. Een root-`.htaccess`
+(`deploy/htaccess-docroot`) routeert alle requests via `public/`, zodat
+`config/`, `src/`, `vendor/` niet rechtstreeks bereikbaar zijn. Geen Java/
+Jackrabbit nodig (PHPCR via doctrine-dbal in MySQL). De **eerste** deploy seedt
+automatisch de content (uit `deploy/seed/legacy.db` → jouw MySQL) en maakt de
+admin-user aan (marker `var/.migrated`).
 
 ```
   jij/Claude ──git push──► GitHub ──Actions(build+rsync over SSH)──► TESTSERVER
