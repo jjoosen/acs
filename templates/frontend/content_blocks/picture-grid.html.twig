@@ -1,0 +1,22 @@
+{% if block is defined %}
+	{% set title = block.field('title') %}
+	{% set title_size = block.field('title_size') %}
+	{% set children = block.children %}
+	{% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="container">
+	{% if title %}
+		<h{{ title_size|default(2) }} class="d-flex align-items-center"><i class="icon icon-instagram-alt mr-1"></i> {{ title }}</h{{ title_size|default(2) }}>
+	{% endif %}
+	<div class="row mb-4 picture-grid__content">
+		{% include 'frontend/content_blocks/partials/_media-list-item.html.twig' %}
+		<div class="js-load-more-container">
+			<div class="text-center picture-grid__load-container d-flex justify-content-center align-items-end">
+				<div class="btn btn--secondary js-load-more-without-pagination">
+					{{ "Laad meer posts"|trans }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

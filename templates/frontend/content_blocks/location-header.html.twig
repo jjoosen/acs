@@ -1,0 +1,54 @@
+{% if block is defined %}
+    {% set title = page.name %}
+    {% set street_number = page.field('street_number') %}
+    {% set postal_city = page.field('postal_city') %}
+    {% set text = block.field('text') %}
+    {% set youtube_id = block.field('youtube_id') %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set video = block.assets.firstOfType('video') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<header id="block-{{ block_id }}" class="header-location position-relative {{ margin_bottom() }}">
+    <div class="header-location__background overflow-hidden position-absolute h-100 w-100 filter-contrast-60 {% if not video or image %}bg-secondary-light{% endif %}">
+        {% if youtube_id %}
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        src="https://www.youtube.com/embed/{{ youtube_id }}?playlist={{ youtube_id }}&enablejsapi=1&autoplay=1&mute=1&controls=0&showinfo=0&autohide=0&modestbranding=1&loop=1"></iframe>
+            </div>
+        {% elseif video %}
+            <video id="video" class="object-fit-cover" width="100%" height="720px" autoplay muted controls {% if image %}poster="{{ img(image.getFilename(), 1920, 720, 'fill', 'smart', 85) }}"{% endif %}>
+                <source src="{{ view_file_link(video.id) }}" type="video/mp4">
+                {% if image %}
+                    <img src="{{ img(image.getFilename(), 1920, 720) }}" alt="{{ 'Uw browser ondersteunt geen video\'s'|trans }}">
+                {% endif %}
+            </video>
+        {% elseif image %}
+            {{ img_macro.picture(image, 1920, 720, 'fill', 'smart', 85, 'w-100') }}
+        {% endif %}
+    </div>
+    <div class="container header-location__content {% if not image %}text-dark{% else %}text-white{% endif %}">
+        <div class="row align-items-center h-100">
+            <div class="col-md-9 col-lg-7 col-xl-5">
+                {% include '/frontend/layout/_breadcrumbs.html.twig' %}
+                {% if title %}
+                    <h1 class="header-location__title mb-0 {% if not image %}text-dark{% else %}text-white{% endif %}">{{ title }}</h1>
+                {% endif %}
+
+                <div class="mb-1 text-shadow">
+                    <i class="icon icon-pin"></i>
+                    <span class="font-size-16">{{ street_number }}, {{ postal_city }}</span>
+                </div>
+
+                {% if text %}
+                    <div class="header-location__text text-shadow white-links">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>

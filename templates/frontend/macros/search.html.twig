@@ -1,0 +1,30 @@
+{# No idea why these are a macros... #}
+{% macro searchBar(class) %}
+    <div class="{% if class %}{{ class }}{% endif %}">
+        <form class="search-box flex-wrap flex-sm-nowrap d-flex w-100 position-relative align-items-center"
+              id="search-box"
+              action="{{ url('frontend.search') }}"
+              method="post"
+        >
+            <input hidden name="t" class="d-none" value="news" />
+            <input type="search" name="q" class="search-box__input form-control mb-1 mb-sm-0" placeholder="Zoeken" />
+            <button class="border-0 outline-0 px-0 background-none search-box__search-icon" type="submit">
+                <i class="icon icon-search align-middle"></i>
+            </button>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro searchBarHeader(class) %}
+    <div class="{% if class %}{{ class }}{% endif %}">
+        <form class="search-box flex-wrap flex-sm-nowrap d-flex w-100 position-relative align-items-center"
+              id="search-box"
+              action="{{ url('frontend.search') }}"
+              method="post"
+        >
+            <input hidden name="t" class="d-none" value="pages" />
+            <input type="search" name="q" class="form-control mb-1 mb-sm-0 mr-2" />
+            <input type="submit" value="Zoeken" class="btn btn--primary px-3">
+        </form>
+    </div>
+{% endmacro %}

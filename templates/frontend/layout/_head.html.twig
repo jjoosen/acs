@@ -1,0 +1,4 @@
+{# Sulu-vervanging voor de oude @InnomedioBase/frontend/head.html.twig include. #}
+<meta charset="utf-8"/>
+<title>{{ meta_title|default(setting('site_name') ?: 'ACS') }}</title>
+{% if meta_description|default %}<meta name="description" content="{{ meta_description }}"/>{% endif %}

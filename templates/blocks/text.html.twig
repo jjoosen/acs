@@ -1,0 +1,16 @@
+{# Sulu block: text — geport van legacy content_blocks/text.html.twig #}
+<div class="text-element-bg">
+    <div class="container {{ margin_bottom() }} {% if block.center|default(false) %}text-center{% endif %}">
+        <div class="row">
+            <div class="col-12 mt-3">
+                {% if block.title|default %}
+                    {% set hs = block.title_size|default(2) %}
+                    <h{{ hs }}>{{ block.title }}</h{{ hs }}>
+                {% endif %}
+                {% if block.text|default %}
+                    <div class="text">{{ block.text|raw }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

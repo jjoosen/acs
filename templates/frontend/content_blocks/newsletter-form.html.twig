@@ -1,0 +1,36 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+    {% set privacyPage = get_page_by_tag('privacy_policy') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}"></div>
+<div class="container {{ margin_bottom() }}" id="newsletter">
+    <div class="element-2"></div>
+
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-7 col-xl-5">
+            {% if title %}
+                <h{{ title_size|default(2) }}>{{ title }}</h{{ title_size|default(2) }}>
+            {% endif %}
+
+            {% if text %}
+                <div class="text mb-2">
+                    {{ text|raw }}
+                </div>
+            {% endif %}
+
+            {{ get_form_by_tag('newsletter') }}
+
+            {% if privacyPage %}
+                <div class="font-size-16">
+                    {{ "Bij inschrijving gaat u akkoord met"|trans }}
+                    <a class="font-weight-bold text-underline" target="_blank" href="{{ privacyPage.url }}">{{ "de privacyverklaring."|trans }}</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>

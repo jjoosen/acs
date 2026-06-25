@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<webspace xmlns="http://schemas.sulu.io/webspace/webspace"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/webspace/webspace http://schemas.sulu.io/webspace/webspace-1.1.xsd">
+
+    <name>ACS</name>
+    <key>acs</key>
+
+    <localizations>
+        <localization language="nl" default="true"/>
+    </localizations>
+
+    <default-templates>
+        <default-template type="page">content</default-template>
+        <default-template type="home">content</default-template>
+    </default-templates>
+
+    <templates>
+        <template type="search">search/search</template>
+        <template type="error">error/error</template>
+    </templates>
+
+    <navigation>
+        <contexts>
+            <context key="main">
+                <meta>
+                    <title lang="nl">Hoofdnavigatie</title>
+                </meta>
+            </context>
+            <context key="footer">
+                <meta>
+                    <title lang="nl">Footer</title>
+                </meta>
+            </context>
+        </contexts>
+    </navigation>
+
+    <portals>
+        <portal>
+            <name>ACS</name>
+            <key>acs</key>
+            <environments>
+                <environment type="prod">
+                    <urls>
+                        <url language="nl">{host}</url>
+                    </urls>
+                </environment>
+                <environment type="dev">
+                    <urls>
+                        <url language="nl">{host}</url>
+                    </urls>
+                </environment>
+            </environments>
+        </portal>
+    </portals>
+</webspace>

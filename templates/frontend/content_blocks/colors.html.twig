@@ -1,0 +1,47 @@
+{% set colors = block.children %}
+{% set title = block.getField('title') %}
+{% set text = block.getField('text') %}
+
+{% if colors %}
+    <div class="{{ margin_bottom() }}">
+        <div class="container">
+            {% if title or text %}
+                <div class="text-center mb-3">
+                    {% if title %}
+                        <h2>{{ title }}</h2>
+                    {% endif %}
+                    {% if text %}
+                        <div class="text">{{ text|raw }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex align-items-center justify-content-center flex-wrap">
+            {% for item in colors %}
+                <div class="color-block {% if item.field('light') %}text-light{% endif %}"
+                     style="background-color: #{{ item.field('hex') }}">
+                    {% if item.field('title') %}
+                    <div class="color-block__title">{{ item.field('title') }}</div>
+                    {% endif %}
+
+                    {% if item.field('hex') %}
+                    <div class="color-block__hex"><strong>HEX:</strong> #{{ item.field('hex') }}</div>
+                    {% endif %}
+
+                    {% if item.field('rgb') %}
+                    <div class="color-block__rgb"><strong>RGB:</strong> {{ item.field('rgb') }}</div>
+                    {% endif %}
+
+                    {% if item.field('hsl') %}
+                    <div class="color-block__hsl"><strong>HSL:</strong> {{ item.field('hsl') }}</div>
+                    {% endif %}
+
+                    {% if item.field('cmyk') %}
+                    <div class="color-block__cmyk"><strong>CMYK:</strong> {{ item.field('cmyk') }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

@@ -1,0 +1,21 @@
+{% if block is defined %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}"></div>
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% if image %}
+    {% if block.field('compact') %}
+        <div class="container">
+            <div class="row">
+                <div class="col-12 default-image py-4">
+                    {{ img_macro.picture(image, 0, 0) }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {{ img_macro.picture(image, 1400, 600, 'fill', 'smart', 85, 'w-100') }}
+    {% endif %}
+{% endif %}

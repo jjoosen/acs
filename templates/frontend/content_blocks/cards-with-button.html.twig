@@ -1,0 +1,56 @@
+{% if block is defined %}
+    {% set cards = block.children %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<section id="block-{{ block_id }}" class="cards-list mt--45px {{ margin_bottom() }}">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% for card in cards %}
+                {% set title = card.field('title') %}
+                {% set text = card.field('text') %}
+                {% set text_small = card.field('text_small') %}
+                {% set link = card.field('link') %}
+                {% set link_text = card.field('link_text') %}
+                {% set image = card.assets.firstOfType('image') %}
+                {% set download = card.assets.firstOfType('download') %}
+
+                {% if download %}
+                    {% set link = download_file_link(download.id) %}
+                {% endif %}
+
+                <div class="col-md-6 col-lg-4 mb-2">
+                    <div class="card h-100 d-flex flex-column justify-content-between card--no-hover-effect text-center py-1 py-md-3">
+                        <div>
+                            {% if image %}
+                                {{ img_macro.picture(image, 65, 65, 'fit', 'smart', 85, 'mw-100 card__img') }}
+                            {% endif %}
+                            <div class="card__body">
+                                <h4 class="card__title">{{ title }}</h4>
+                                <div class="card__text">
+                                    {% if text %}
+                                        {{ text|raw }}
+                                    {% endif %}
+                                    {% if text_small %}
+                                        <div class="font-size-12">{{ text_small }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if link %}
+                            <a href="{{ link }}" class="btn btn--tertiary align-self-end text-center mx-auto">
+                                {% if download %}
+                                    <i class="icon icon-download font-size-20"></i>
+                                {% endif %}
+                                {{ link_text ?: "Lees meer"|trans }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,84 @@
+{% if block is defined %}
+	{% set title = page.name %}
+	{% set author = page.field('author') %}
+	{% set image = block.assets.firstOfType('image') %}
+	{% set text = block.field('text') %}
+	{% set block_id = block.id %}
+
+{% endif %}
+
+<header id="block-{{ block_id }}" class="header-small position-relative {{ margin_bottom() }}">
+	<div class="background-cover background-center position-absolute h-100 w-100 filter-contrast-60 {% if not image %}bg-secondary-light{% endif %}" {% if image %} style="background-image: linear-gradient(0deg, rgba(81, 136, 250, 0.55), rgba(81, 136, 250, 0.55)), url({{ img(image.getFilename(), 1440, 640) }})" {% endif %}></div>
+	<div class="container header-small__content {% if not image %}text-dark{% else %}text-white{% endif %}">
+		<div class="row align-items-center h-100">
+			<div class="col-12">
+				{% include '/frontend/layout/_breadcrumbs.html.twig' %}
+				{% if title %}
+					<h1 class="header__title {% if not image %}text-dark{% else %}text-white{% endif %}">{{ title }}</h1>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</header>
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<div class="text">
+				<div class="mb-2 opacity-70">
+					{{ "Gepost op"|trans }}
+					<time datetime="{{ page.publishDate|date('Y-m-d') }}">{{ page.publishDate|localizeddate('none', 'none', app.request.locale, null, 'd MMMM Y') }}</time>
+				</div>
+
+				{% if text %}
+					<div {{ margin_bottom() }}>
+						{{ text|raw }}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{# Structured Data - UPDATE ACCORDINGLY! #}
+{# All these properties are required - (if these are not present, you may as well remove the structured data) #}
+{# Always check with https://search.google.com/structured-data/testing-tool/u/0/ or a browser plugin #}
+	<script type="application/ld+json"> {
+		    "@context": "http://schema.org",
+		    "@type": "NewsArticle",
+		    "mainEntityOfPage": {
+		        "@type": "WebPage",
+		        "@id": "{{ app.request.getSchemeAndHttpHost() ~ app.request.pathinfo }}"
+		    },
+		    "headline": "{{ block.field('title') ?: page.name }}",
+		    "image": [
+	{% if image %}
+		{# First image should be 1200px wide MINIMUM #}
+		"{{ img(image.getFilename(), 1200, 1200, 'fit', 'smart') }}",
+		{# For best results, provide multiple high-resolution images
+		           (minimum of 800,000 pixels when multiplying width and height)
+		           with the following aspect ratios: 16x9, 4x3, and 1x1 #}
+		"{{ img(image.getFilename(), 1200, 675, 'fill', 'smart') }}",
+		{# 16:9 - 810,000px #}
+		"{{ img(image.getFilename(), 1200, 900, 'fill', 'smart') }}",
+		{# 4:3 - 1,080,000px #}
+		"{{ img(image.getFilename(), 1200, 1200, 'fill', 'smart') }}"
+		{# 1:1 - 1,440,000px #}
+	{% endif %}
+	],
+	    "datePublished": "{{ page.publishDate|date('Y-m-d\\TH:i:sP') }}",
+	    "author": {
+	      "@type": "Person",
+	      "name": "{{ author }}"
+	    },
+	    "publisher": {
+	      "@type": "Organization",
+	      "name": "{{ setting('company_name') }}",
+	      "logo": {
+	        "@type": "ImageObject",
+	{# UPDATE THIS! #}
+	"url": "{{ app.request.getSchemeAndHttpHost() }}/build/images/{{ setting('logo_name') }}.png"
+	      }
+	    }
+	}
+</script>

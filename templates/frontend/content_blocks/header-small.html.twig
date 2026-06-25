@@ -1,0 +1,20 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+<header id="block-{{ block_id }}" class="{% if transparentNav %}header-small-trans {% endif%} header-small position-relative {{ margin_bottom() }}">
+    <div class="header-small__image position-absolute h-100 w-100 filter-contrast-60 {% if not image %}bg-secondary-light{% endif %}"
+         {% if image %}style="background-image: linear-gradient(0deg, rgba(81, 136, 250, 0.55), rgba(81, 136, 250, 0.55)), url({{ img(image.getFilename(), 1920, 1000) }})"{% endif %}></div>
+    <div class="container header-small__content {% if transparentNav %}header-small-trans__content {% endif%} {% if not image %}text-dark{% else %}text-white{% endif %}">
+        <div class="row align-items-center h-100">
+            <div class="col-12">
+                {% include '/frontend/layout/_breadcrumbs.html.twig' %}
+                {% if title %}
+                    <h1 class="header__title">{{ title }}</h1>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,51 @@
+.quote {
+
+  &__text{
+    font-weight: bold;
+    position: relative;
+
+    &::before {
+      color: $gray-400;
+      content: open-quote;
+      font-size: 4em;
+      margin-left: 0;
+      margin-top: -0.4em;
+
+      @include media-breakpoint-up(sm) {
+        position: absolute;
+        margin-left: -0.6em;
+      }
+    }
+
+    &::after {
+      color: $gray-400;
+      content: close-quote;
+      font-size: 4em;
+      bottom: 0;
+      right: 0;
+      margin-bottom: -0.8em;
+      display: flex;
+      justify-content: flex-end;
+
+      @include media-breakpoint-up(sm) {
+        position: absolute;
+        margin-right: -0.6em;
+      }
+    }
+  }
+
+  &__author{
+    color: $gray-400;
+    font-weight: 200;
+    font-size: 0.8rem;
+  }
+
+}
+
+// Yes, completely different design for slider
+.quote-slide {
+  &__quote {
+    font-size: 24px;
+    font-weight: 300;
+  }
+}

@@ -1,0 +1,78 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<div id="block-{{ block_id }}" class="bg-location-list">
+    <div class="element-1"></div>
+    <div class="element-3"></div>
+
+    <section class="locations-list {{ margin_bottom() }}">
+        <div class="container">
+            <div class="row mb-3">
+                <div class="col-lg-8">
+                    {% if title %}
+                        <h2>{{ title }}</h2>
+                    {% endif %}
+
+                    {% if text %}
+                        <div class="text">
+                            {{ text|raw }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                {# @var location_item \Innomedio\Symfony\Bundle\BaseBundle\Service\Content\ObjectBuilder\Page #}
+                {% for location_item in listview_items %}
+                    {%  set street_number = location_item.field('street_number') %}
+                    {%  set postal_city = location_item.field('postal_city') %}
+                    {%  set email = location_item.field('email') %}
+                    {%  set phone = location_item.field('phone') %}
+                    {% set image = location_item.assets.firstOfType('image') %}
+
+                    <div class="col-sm-6 col-lg-4 mb-3">
+                        <div class="card card--no-hover-effect d-block">
+                            <a href="{{ location_item.url }}">
+                                {% if image %}
+                                    {{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                                {% else %}
+                                    {{ img_macro.placeholder(location_item.name, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                                {% endif %}
+                            </a>
+                            <div class="card__body">
+                                <h4 class="card__title">{{ location_item.name }}</h4>
+                                <div class="text-dark mb-10px">
+                                    {{ street_number }} <br>
+                                    {{ postal_city }} <br>
+                                    {{ "België"|trans }} <br>
+                                </div>
+                                {% if email %}
+                                    <a href="mailto:{{ email }}" onclick="plausible('click_mailadres')" class="d-flex align-items-center mb-5px">
+                                        <i class="icon icon-email mr-10px"></i>{{ email }}
+                                    </a>
+                                {% endif %}
+
+                                {% if phone %}
+                                    <a href="tel:{{ phone|replace({' ': ''}) }}" onclick="plausible('click_telefoonnummer')" class="d-flex align-items-center mb-2">
+                                        <i class="icon icon-phone mr-10px"></i>{{ phone }}
+                                    </a>
+                                {% endif %}
+
+                                <a href="{{ location_item.url }}"
+                                   class="btn btn--arrow btn--arrow-primary">
+                                    {{ "Neem contact op"|trans }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+{% include 'frontend/content_blocks/partials/_structured_data_locations.html.twig' %}

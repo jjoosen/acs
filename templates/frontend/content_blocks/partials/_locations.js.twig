@@ -1,0 +1,42 @@
+{% if page.contentTypeTag == 'location' %}
+    {% set name = page.name %}
+    {% set url = page.url %}
+    {% set street_number = page.field('street_number') %}
+    {% set postal_city = page.field('postal_city') %}
+    {% set latitude = page.field('latitude') %}
+    {% set longitude = page.field('longitude') %}
+
+    {% if latitude and longitude %}
+    var locations = [
+        {
+            title: "{{ name }}",
+            url: "{{ url }}",
+            street: "{{ street_number }}",
+            city: "{{ postal_city }}",
+            lat: "{{ latitude }}",
+            lng: "{{ longitude }}"
+        }
+    ];
+    {% endif %}
+{% else %}
+    {% set locations = get_content('location', 0, 999, {}, 'sortIndex') %}
+
+    var locations = [
+        {% for location in locations %}
+            {% set name = location.name %}
+            {% set street_number = location.field('street_number') %}
+            {% set postal_city = location.field('postal_city') %}
+            {% set latitude = location.field('latitude') %}
+            {% set longitude = location.field('longitude') %}
+                {
+                    title: "{{ name }}",
+                    url: "{{ location.url }}",
+                    street: "{{ street_number }}",
+                    city: "{{ postal_city }}",
+                    lat: "{{ latitude }}",
+                    lng: "{{ longitude }}"
+                }
+            {% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+{% endif %}

@@ -1,0 +1,49 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+
+    {% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="text-element-bg">
+
+    <div class="container {{ margin_bottom() }}">
+        <div class="row">
+            <div class="col-12 mt-3">
+                {% if title %}
+                    <h{{ title_size|default(2) }}>{{ title }}</h{{ title_size|default(2) }}>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+
+                {% include '/frontend/content_blocks/partials/_buttons.html.twig' %}
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline__line"></div>
+            {% for item in block.children %}
+
+                <div class="row timeline__row {% if loop.index is even %}justify-content-end{% else %}justify-content-start{% endif %}">
+                    <div class="timeline__dot"></div>
+                    <div class="col-11 col-lg-5  box-shadow rounded p-3">
+
+
+                        <p class="h3 d-flex flex-row align-center mb-2">
+                            {{ item.fields.title }}
+                        </p>
+                        <div class="text">
+                            {{ item.fields.text|raw }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>

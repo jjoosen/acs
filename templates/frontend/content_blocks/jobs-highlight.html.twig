@@ -1,0 +1,52 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set jobs = latest_jobs(2) %}
+    {% set jobsPage = get_page_by_tag('jobs') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<section id="block-{{ block_id }}" class="bg-theme-color pt-5 pb-4 mb-3 mb-lg-6">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-2 mb-md-0 position-relative">
+                {% if image %}
+                    {{ img_macro.picture(image, 400, 480, 'fill', 'smart', 85, 'w-100 rounded position-md-absolute box-shadow js-scroll-reveal') }}
+                {% endif %}
+            </div>
+            <div class="col-md-7 col-xl-5 offset-md-1">
+                {% if title %}
+                    <h2 class="text-white">{{ title }}</h2>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text mb-1">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+
+                <div class="js-scroll-reveal-children">
+                    {% for job_item in jobs %}
+                        <a class="card d-block mb-1" href="{{ job_item.url }}">
+                            <div class="card__body">
+                                <h4 class="card__title mb-0">
+                                    <i class="icon icon-job font-size-25 mr-2"></i>
+                                    {{ job_item.title }}
+                                </h4>
+                            </div>
+                        </a>
+                    {% endfor %}
+
+                    {% if jobsPage %}
+                        <a class="btn btn--arrow btn--arrow-secondary" href="{{ jobsPage.url }}">
+                            {{ "Bekijk alle vacatures"|trans }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,16 @@
+{# Sulu block: quote — geport van legacy content_blocks/quote.html.twig #}
+{% set center = block.center|default(false) %}
+<div class="container mb-3">
+    <div class="row align-items-center {% if center %}justify-content-center{% else %}justify-content-start ml-3{% endif %}">
+        <div class="col-sm-7 col-md-6 col-lg-5 col-xl-4">
+            <figure class="quote">
+                <blockquote class="quote__text mb-2">
+                    {% if block.text|default %}{{ block.text|raw }}{% endif %}
+                </blockquote>
+                <figcaption class="quote__author">
+                    {% if block.text_small|default %}{{ block.text_small|raw }}{% endif %}
+                </figcaption>
+            </figure>
+        </div>
+    </div>
+</div>

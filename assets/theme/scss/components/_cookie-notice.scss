@@ -1,0 +1,47 @@
+/**
+Cookie notice
+ */
+.cookie-notice {
+  position: fixed;
+  right: 30px;
+  bottom: 15px;
+  z-index: 1000;
+  width: 400px;
+  max-width: 100%;
+  padding: $grid-gutter-width;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow-lg;
+  background-color: #fff;
+
+  @include media-breakpoint-down(sm) {
+    width: 100%;
+    bottom: 0;
+    right: 0;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  label {
+    color: $color-text;
+  }
+
+  &__message {
+    @include media-breakpoint-down(sm) {
+      font-size: 0.8rem;
+    }
+  }
+
+  &__title {
+    @include media-breakpoint-down(sm) {
+      font-size: 1.1rem;
+    }
+  }
+
+  &__label {
+    @include media-breakpoint-down(sm) {
+      font-size: 1rem;
+    }
+  }
+}

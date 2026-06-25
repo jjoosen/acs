@@ -1,0 +1,18 @@
+.pagination__page-nr, .pagination__arrow {
+  width: 32px;
+  text-align: center;
+  height: 32px;
+  border-radius: $border-radius;
+  padding: 0;
+  margin: 0 5px;
+
+  &:hover, &:focus, &.is-active {
+    background: $color-1;
+    color: white;
+    text-decoration: none;
+  }
+}
+
+.pagination__page-nr {
+  color: #555555;
+}

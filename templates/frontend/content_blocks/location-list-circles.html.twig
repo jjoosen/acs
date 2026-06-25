@@ -1,0 +1,66 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set locations = get_content('location', 0, 999, {}, 'sortIndex') %}
+    {% set block_id = block.id %}
+{% endif %}
+-
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% if locations %}
+    <div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+        <div class="row mb-3">
+            <div class="col-lg-7">
+                {% if title %}
+                    <h2 class="mb-1">{{ title }}</h2>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row text-center text-sm-left">
+            {% for location in locations %}
+                {% set name = location.name %}
+                {% set street_number = location.field('street_number') %}
+                {% set postal_city = location.field('postal_city') %}
+                {% set email = location.field('email') %}
+                {% set phone = location.field('phone') %}
+                {% set image = location.assets.firstOfType('image') %}
+
+                <div class="col-lg-6 mb-3 pb-1 location">
+                    {% if image %}
+                        <div class="d-inline-block rounded-circle align-top mr-sm-3 overflow-hidden location__image location__image--round mb-2 mb-sm-0">
+                            {{ img_macro.picture(image, 140, 140, 'fit', 'smart', 85, "h-100 object-fit-cover w-100") }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-sm-inline-block font-size-16">
+                        <h3 class="mb-0">{{ name }}</h3>
+                        <div>{{ street_number }}, {{ postal_city }}</div>
+
+                        <div class="mt-1">
+                            {% if email %}
+                                <a href="mailto:{{ email }}" onclick="plausible('click_mailadres')" class="d-block text-decoration-none">
+                                    <i class="icon icon-email mr-10px"></i> {{ email }}
+                                </a>
+                            {% endif %}
+
+                            {% if phone %}
+                                <a href="tel:{{ phone|replace({' ': ''}) }}" onclick="plausible('click_telefoonnummer')" class="d-block">
+                                    <i class="icon icon-phone mr-10px"></i> {{ phone }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% include 'frontend/content_blocks/partials/_structured_data_locations.html.twig' %}

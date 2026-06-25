@@ -1,0 +1,16 @@
+.toggle-list {
+  .icon-angle-down:before {
+    display: inline-block;
+    transition: $transition-base;
+    transform: rotate(180deg);
+  }
+}
+
+.collapsed {
+  .icon-minus:before {
+    font-icon: url('../images/icons/plus.svg');
+  }
+  .icon-angle-down:before {
+    transform: rotate(0);
+  }
+}

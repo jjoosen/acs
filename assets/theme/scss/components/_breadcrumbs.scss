@@ -1,0 +1,44 @@
+/**
+Breadcrumbs
+ */
+
+.breadcrumbs {
+  text-align: left;
+}
+
+.breadcrumbs__list {
+  margin-left: -10px;
+}
+
+.breadcrumbs__item {
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: middle;
+
+  &:after {
+    content: '/';
+    vertical-align: middle;
+    opacity: 0.5;
+  }
+
+  &:last-child:after {
+    content: none;
+  }
+}
+
+.breadcrumbs__link {
+  color: inherit;
+  font-size: 16px;
+  padding: 5px 10px;
+  vertical-align: middle;
+  display: inline-block;
+
+  &:not(.is-active) {
+    opacity: 0.5;
+  }
+
+  &:hover, &:focus {
+    color: inherit;
+    opacity: 1;
+  }
+}

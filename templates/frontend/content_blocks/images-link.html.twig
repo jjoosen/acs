@@ -1,0 +1,18 @@
+{% if block is defined %}
+	{% set title = block.field('title') %}
+	{% set children = block.children %}
+	{% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+	{% if title %}
+		<h2 class="d-flex align-items-center">{{ title }}</h2>
+	{% endif %}
+	{% if children %}
+		<div class="row justify-content-around">
+			{%  for child in children %}
+				{% include 'frontend/content_blocks/partials/_image-link.html.twig' %}
+			{% endfor %}
+		</div>
+	{% endif %}
+</div>

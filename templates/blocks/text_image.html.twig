@@ -1,0 +1,22 @@
+{# Sulu block: text_image — geport van legacy content_blocks/text-images.html.twig #}
+{% set image = (block.images|default([]))|first %}
+{% set img_left = block.img_left|default(false) %}
+{% set img_small = block.img_small|default(false) %}
+<div class="text-images {{ margin_bottom() }} {% if block.scroll_reveal|default(false) %}js-scroll-reveal{% endif %}">
+    <div class="container">
+        <div class="row align-items-center {% if img_left %}flex-row-reverse{% endif %}">
+            <div class="{% if img_small %}col-md-7{% else %}col-md-6{% endif %}">
+                {% if block.title|default %}
+                    {% set hs = block.title_size|default(2) %}
+                    <h{{ hs }}>{{ block.title }}</h{{ hs }}>
+                {% endif %}
+                {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
+            </div>
+            {% if image %}
+                <div class="{% if img_small %}col-md-5{% else %}col-md-6{% endif %}">
+                    <img class="img-fluid" src="{{ img(image, 800, 600) }}" alt="{{ image.title }}" loading="lazy">
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="bg-text-menu">
+    <div class="element-2"></div>
+
+    <div class="container {{ margin_bottom() }}">
+        <div class="row">
+            <div class="col-md-8 mb-2 mb-md-0">
+                {% if title %}
+                    <h2>{{ title }}</h2>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text mb-3">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+
+                {% for subblock in block.children if subblock.realTag != 'button' %}
+                    <div class="mb-3">
+                        {% include '/frontend/content_blocks/partials/_' ~ subblock.realTag ~ '.html.twig' with {block: subblock} %}
+                    </div>
+                {% endfor %}
+
+                {% include '/frontend/content_blocks/partials/_buttons.html.twig' %}
+            </div>
+
+            {% if page.parentId %}
+            <div class="col-md-4 col-lg-3 offset-lg-1">
+                <h3>{{ get_page_by_id(page.parentId).name }}</h3>
+                {% set subPages = get_children_by_id(page.parentId) %}
+
+                <ul class="side-menu list-unstyled">
+                    {% for page in subPages %}
+                        {% set isCurrent = app.request.uri ends with page.url %}
+                        <li class="side-menu__item {% if isCurrent %}is-active{% endif %}">
+                            {% if isCurrent %}
+                                <div class="side-menu__link text-secondary">{{ page.name }}</div>
+                            {% else %}
+                                <a class="side-menu__link" href="{{ page.url }}">{{ page.name }}</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

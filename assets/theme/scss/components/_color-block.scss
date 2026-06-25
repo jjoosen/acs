@@ -1,0 +1,28 @@
+.color-block {
+  color: $body-color;
+  display: block;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  text-align: center;
+  width: 300px;
+  padding: 16px;
+  font-size: 14px;
+  margin: 16px;
+  line-height: 2;
+  flex-shrink: 0;
+
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  &__title {
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  strong {
+    opacity: 0.75;
+  }
+}

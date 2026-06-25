@@ -1,0 +1,7 @@
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% set image = block.assets.firstOfType('image') %}
+
+{% if image %}
+   {{ img_macro.picture(image, 795, 2000, 'fit', 'smart', 85, 'w-100') }}
+{% endif %}

@@ -1,0 +1,82 @@
+{% set street_number = page.field('street_number') %}
+{% set postal_city = page.field('postal_city') %}
+{% set postal_code = postal_city|split(' ')|first %}
+{% set city = postal_city|split(' ')|last %}
+{% set email = page.field('email') %}
+{% set phone = page.field('phone') %}
+{% set image = page.assets.firstOfType('image') %}
+
+<div class="bg-secondary-light">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-lg-8 mb-2 mb-lg-0">
+                <div class="bg-white rounded box-shadow p-1 p-sm-3">
+                    <h3>{{ "Stuur een bericht naar "|trans }} {{ page.name }}</h3>
+                    {{ get_form_by_tag('contact', null, false, {}, hiddenFieldsForConfirmation = {'location': page.name}) }}
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="bg-white rounded box-shadow p-3 font-size-16">
+                    <h3>{{ "Contactgegevens"|trans }}</h3>
+                    <h4 class="text-dark mb-0">{{ page.name }}</h4>
+                    <div>{{ street_number }}, {{ postal_city }}</div>
+
+                    <div class="mt-1">
+                        {% if email %}
+                            <a href="mailto:{{ email }}" onclick="plausible('click_mailadres')" class="d-block text-decoration-none">
+                                <i class="icon icon-email mr-10px"></i> {{ email }}
+                            </a>
+                        {% endif %}
+
+                        {% if phone %}
+                            <a href="tel:{{ phone|replace({' ': ''}) }}" onclick="plausible('click_telefoonnummer')" class="d-block">
+                                <i class="icon icon-phone mr-10px"></i> {{ phone }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "url": "{{ app.request.getSchemeAndHttpHost() }}",
+    {# UPDATE THIS! #}
+    "logo": "{{ app.request.getSchemeAndHttpHost() }}/build/images/{{ setting('logo_name') }}.png",
+    {% if setting('company_name') %}
+    "name": "{{ setting('company_name') }}",
+    {% endif %}
+
+    "location": [
+        {
+            "@type": "PostalAddress",
+            {% if page %}
+            "name" : "{{ page.name }}",
+            {% endif %}
+            {% if image %}
+            "image": "{{ image.getFilename() }}",
+            {% endif %}
+            {% if city %}
+            "addressLocality": "{{ city }}",
+            {% endif %}
+            {% if postal_code %}
+            "postalCode": "{{ postal_code }}",
+            {% endif %}
+            {% if street_number %}
+            "streetAddress": "{{ street_number }}",
+            {% endif %}
+            {% if phone %}
+            "telephone" : "{{ phone }}",
+            {% endif %}
+            {% if email %}
+            "email": "{{ email }}"
+            {% endif %}
+        }
+    ]
+}
+</script>

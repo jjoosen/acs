@@ -1,0 +1,68 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set news = get_content('news', 1, 2, {}, 'published' ) %}
+    {% set newsPage = get_page_by_tag('news') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<div id="block-{{ block_id }}" class="latest-news-bg">
+    <div class="element-3"></div>
+
+    <div class="container {{ margin_bottom() }}">
+        <div class="row">
+            <div class="col-12 col-xl-4 mb-2 mb-xl-0">
+                {% if title %}
+                    <h2>{{ title }}</h2>
+                {% endif %}
+                <div>
+                    {% if text %}
+                        <div class="text">
+                            {{ text|raw }}
+                        </div>
+                    {% endif %}
+
+                    {% if newsPage %}
+                    <a class="btn btn--arrow btn--arrow-secondary" href="{{ newsPage.url }}">
+                        {{ "Ontdek onze blog"|trans }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% for news_item in news %}
+                <div class="col-sm-6 col-xl-4 mb-1 js-scroll-reveal">
+                    {% if news_item.field('external_link') %}
+                        {% set url = news_item.field('external_link') %}
+                    {% else %}
+                        {% set url = news_item.url %}
+                    {% endif %}
+
+                    <a href="{{ url }}"{% if news_item.field('external_link') %} target="_blank"{% endif %} class="card">
+                        <div class="background-effect"></div>
+
+                        {% set image = news_item.assets.firstOfType('image') %}
+                        {% if image %}
+                            {{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                        {% else %}
+                            {{ img_macro.placeholder(news_item.name, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                        {% endif %}
+                        <div class="card__body">
+                            <h4 class="card__title">{{ news_item.name }}</h4>
+                            {% if news_item.field('short') %}
+                                <div class="card__text">
+                                    {{ news_item.field('short')|raw }}
+                                </div>
+                            {% endif %}
+                            <div class="btn btn--arrow btn--arrow-primary">
+                                {{ "Lees meer"|trans }}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

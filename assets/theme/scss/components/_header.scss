@@ -1,0 +1,120 @@
+.header {
+  z-index: 2;
+
+  .background-effect {
+    display: none;
+  }
+
+  &.add-background {
+    .background-effect {
+      position: absolute;
+      width: 64%;
+      opacity: 0.8;
+      display: block;
+      height: 100%;
+      background: $color-4;
+      z-index: 1;
+      // background: radial-gradient(circle at top left,transparent 4vw, darkblue 4.1vw);
+      -webkit-mask-image: radial-gradient(circle 551px at bottom right, transparent 0, transparent 100%, black 201px);
+
+      @include media-breakpoint-only(lg) {
+        width: 80%;
+      }
+
+      @include media-breakpoint-only(md) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.header-nav {
+  position: relative;
+  z-index: 3;
+}
+
+.header__content {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  z-index: 4;
+  position: relative;
+
+  @include media-breakpoint-up(md) {
+    padding-top: 100px;
+    padding-bottom: 100px;
+  }
+
+  @include media-breakpoint-up(lg) {
+    padding-top: 180px;
+    padding-bottom: 180px;
+  }
+}
+
+.header.add-background {
+  .header__content {
+    max-height: 551px;
+
+    @include media-breakpoint-up(lg) {
+      padding-top: 0;
+      padding-bottom: 0;
+      height: 551px;
+    }
+  }
+}
+
+.header-location__content {
+  padding-top: 50px;
+  padding-bottom: 50px;
+
+  @include media-breakpoint-up(md) {
+    padding-top: 100px;
+    padding-bottom: 100px;
+  }
+
+  @include media-breakpoint-up(lg) {
+    padding-top: 160px;
+    padding-bottom: 160px;
+  }
+}
+
+.header-small__image {
+  background-size: cover;
+  background-position: center;
+
+  @include media-breakpoint-up(lg) {
+    background-attachment: fixed;
+  }
+
+}
+
+.header-small__content {
+  padding-top: 40px;
+  padding-bottom: 40px;
+
+  @include media-breakpoint-up(md) {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+}
+
+.header__nav-item {
+  padding: 22px 22px 22px 32px;
+
+  &:hover, &:focus {
+    background: $color-light-blue;
+  }
+}
+
+// centers any huge element in the middle vertically and horizontally
+// with respect to its parent no matter both of their sizes
+
+.header__video-image, .header__video {
+  position: absolute;
+  top: -9999px;
+  bottom: -9999px;
+  left: -9999px;
+  right: -9999px;
+  margin: auto;
+}
+
+

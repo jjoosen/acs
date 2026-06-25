@@ -1,0 +1,11 @@
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+{% import 'frontend/macros/sidebar.html.twig' as sidebar %}
+
+{% set children = block is defined ? block.children : null %}
+{% if children %}
+    {% for child in children if child.realTag == 'sidebar_block_text' %}
+        {{ sidebar.text_block(child.field('title'), child.field('text'), child.field('subtitle'), child.field('email'), child.field('phone'), child.assets.firstOfType('image')) }}
+    {% endfor %}
+{% endif %}
+
+

@@ -1,0 +1,32 @@
+.side-menu {
+  border-left: 1px solid #e0e0e0;
+  color: $color-text;
+}
+
+.side-menu--sticky {
+  position: sticky;
+  top: 30px;
+}
+
+.side-menu__item {
+  margin-left: -2px;
+  padding-left: 10px;
+
+  &.is-active {
+    border-left: 3px solid $color-2;
+
+    .side-menu__link {
+      color: $color-2;
+    }
+  }
+}
+
+.side-menu__link {
+  padding: 10px;
+  display: block;
+  cursor: pointer;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
+}

@@ -1,0 +1,36 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+    {% if title %}
+        <div class="row mb-2">
+            <div class="col-12">
+                <h{{ title_size|default(2) }} class="mb-0">{{ title }}</h{{ title_size|default(2) }}>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row box-shadow p-2 align-items-center rounded no-gutters">
+        <div class="col-md-9 col-lg-8 p-10px order-1 order-md-0">
+            {% if text %}
+                <div class="text font-size-18">
+                    {{ text|raw }}
+                </div>
+            {% endif %}
+
+            {% include '/frontend/content_blocks/partials/_buttons.html.twig' %}
+        </div>
+        {% if image %}
+            <div class="col-md-3 offset-lg-1 text-md-center">
+                {{ img_macro.picture(image, 178, 33, 'fit', 'smart', 85, 'mw-100') }}
+            </div>
+        {% endif %}
+    </div>
+</div>

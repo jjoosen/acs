@@ -1,0 +1,111 @@
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+{% import 'frontend/macros/search.html.twig' as search %}
+{% set newsPage = get_page_by_tag('news') %}
+{% set sectionTags = get_content('sections', 1, 50, [], 'sortIndex') %}
+
+<section class="news-list {{ margin_bottom() }}">
+    <div class="container">
+        <div class="row justify-content-between {{ margin_bottom() }}">
+            <div class="col-md-6 col-lg-5 mb-2 mb-md-0">
+                <div class="text-right select-wrapper arrow position-relative d-flex">
+                    {#
+                    <select name="section-filter" class="mr-1 form-control form-select custom-select d-inline-block w-50" id="sector-filter">
+                        <option value="null">{{ 'Alle sectoren'|trans }}</option>
+                        {% for tag in sectionTags %}
+                            <option value="{{ tag.name|url_encode }}" {% if tag.name|url_encode == app.request.query.get('sector') %}selected{% endif %}>{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                    #}
+
+                    {% if listview_tags is defined and listview_tags|length > 1 %}
+                        <select name="filter" class="js-filter form-control form-select custom-select d-inline-block w-50">
+                            <option value="{{ newsPage.url }}">{{ 'Alle categorieën'|trans }}</option>
+                            {% for tag in listview_tags %}
+                                <option value="{{ tag.url }}" {% if tag.url in app.request.uri %}selected{% endif %}>{{ tag.name }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                {{ search.searchBar() }}
+            </div>
+        </div>
+        <div class="row">
+            {# @var news_item \Innomedio\Symfony\Bundle\BaseBundle\Service\Content\ObjectBuilder\Page #}
+            {% for news_item in listview_items %}
+                <div class="col-sm-6 col-xl-4 mb-32px d-flex">
+                    {% if news_item.field('external_link') %}
+                        {% set url = news_item.field('external_link') %}
+                    {% else %}
+                        {% set url = news_item.url %}
+                    {% endif %}
+
+                    <a href="{{ url }}"{% if news_item.field('external_link') %} target="_blank"{% endif %} class="card w-100">
+                        {% set image = news_item.assets.firstOfType('image') %}
+                        {% if image %}
+                            {{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                        {% else %}
+                            {{ img_macro.placeholder(news_item.name, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                        {% endif %}
+                        <div class="card__body">
+                            <h4 class="card__title mb-0">{{ news_item.name }}</h4>
+                            <div class="font-size-14 opacity-70 mb-1">
+                                {{ "Gepost op"|trans }}
+                                <time datetime="{{ news_item.publishDate|date('Y-m-d') }}">{{ news_item.publishDate|localizeddate('none', 'none', app.request.locale, null, 'd MMMM Y') }}</time>
+                            </div>
+
+                            {% if news_item.field('short') %}
+                                <div class="card__text">
+                                    {{ news_item.field('short')|raw }}
+                                </div>
+                            {% endif %}
+                            <div class="btn btn--arrow btn--arrow-primary">
+                                {{ "Lees meer"|trans }}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            {% if listview_page_links|length > 1 %}
+                <div class="col-12">
+                    <div class="pagination d-flex justify-content-center mt-2">
+                        {% set previousPage = listview_active_page - 1 %}
+                        {% if previousPage > 0 %}
+                            <a href="{{ listview_page_links[previousPage] }}" class="text-decoration-none pagination__arrow pagination__arrow--previous">
+                                <i class="icon icon-arrow-left font-size-10 pagination__icon pagination__icon--previous"></i>
+                            </a>
+                        {% endif %}
+
+                        {% for link in listview_page_links  %}
+                            <a href="{{ link }}" class="pagination__page-nr {% if listview_active_page == loop.index %}is-active{% endif %}">
+                                {{ loop.index }}
+                            </a>
+                        {% endfor %}
+
+                        {% set nextPage = listview_active_page + 1 %}
+                        {% if nextPage <= listview_page_links|length %}
+                            <a href="{{ listview_page_links[nextPage] }}" class="text-decoration-none pagination__arrow pagination__arrow--next">
+                                <i class="icon icon-arrow-right font-size-10 pagination__icon pagination__icon--next"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<script>
+    document.getElementById("sector-filter").addEventListener("change", function () {
+        var value = document.getElementById("sector-filter").value;
+        var urlParams = new URLSearchParams(window.location.search);
+
+        urlParams.set('sector', value);
+
+        window.location.search = urlParams;
+    });
+</script>

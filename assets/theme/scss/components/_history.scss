@@ -1,0 +1,47 @@
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+
+  &__line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: $border-color;
+    transform: translateX(-50%);
+  }
+
+  &__row {
+    position: relative;
+    margin-bottom: 2.5rem;
+  }
+
+  &__dot {
+    position: absolute;
+    left: 50%;
+    top: 1rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: $primary;
+    border: 2px solid $primary;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  &_icon {
+    display: block;
+    height: 34px;
+    width: 34px;
+    position: relative;
+
+    i {
+      font-size: 24px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+    {% set locations = get_content('location', 1, 100, {}, 'sortIndex') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="bg-secondary-light pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5 my-4 text-center">
+                {% if title %}
+                    <h{{ title_size|default(2) }} class="h2">{{ title }}</h{{ title_size|default(2) }}>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text text-primary">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-4 mb-lg-6 mt--100px">
+    <div class="mb-2">
+        {% include '/frontend/layout/_breadcrumbs.html.twig' %}
+    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="bg-white rounded box-shadow p-1 p-sm-3">
+                <h3>{{ "Stuur ons een bericht"|trans }}</h3>
+                {{ get_form_by_tag('contact', null, false, {}, hiddenFieldsForConfirmation = {'location': ''}) }}
+            </div>
+        </div>
+        {% if locations|length %}
+            <div class="col-lg-4">
+                <div class="toggle-list rounded box-shadow bg-white px-1 px-md-3">
+                    {% for location in locations %}
+                        {% set street_number = location.field('street_number') %}
+                        {% set postal_city = location.field('postal_city') %}
+                        {% set postal_code = postal_city|split(' ')|first %}
+                        {% set city = postal_city|split(' ')|last %}
+                        {% set email = location.field('email') %}
+                        {% set phone = location.field('phone') %}
+
+                        <div class="font-size-18 {% if not loop.last %}border-bottom{% endif %}">
+                            <div data-toggle="collapse"
+                                 data-target="#collapsable-{{ location.id }}"
+                                 class="collapsed cursor-pointer py-2 font-weight-bold w-100 d-flex justify-content-between align-items-center">
+                                {{ location.name }}
+                                <i class="icon icon-angle-down font-size-10 text-secondary collapse-caret"></i>
+                            </div>
+
+                            <div class="collapse" id="collapsable-{{ location.id }}">
+                                <div class="text pb-2">
+                                    <div class="mb-1">{{ street_number }}, {{ postal_city }}</div>
+
+                                    <div class="mt-1">
+                                        {% if email %}
+                                            <a href="mailto:{{ email }}" onclick="plausible('click_mailadres')" class="d-flex align-items-center text-decoration-none text-primary">
+                                                <i class="icon icon-email mr-10px"></i>{{ email }}
+                                            </a>
+                                        {% endif %}
+
+                                        {% if phone %}
+                                            <a href="tel:{{ phone|replace({' ': ''}) }}" onclick="plausible('click_telefoonnummer')" class="d-flex align-items-center text-primary">
+                                                <i class="icon icon-phone mr-10px"></i>{{ phone }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>

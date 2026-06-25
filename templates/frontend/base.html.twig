@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    {% include "frontend/layout/_head.html.twig" %}
+
+    <meta property="og:url" content="{{ app.request.uri }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="{{ meta_title|default(setting('site_name')) }}"/>
+    <meta property="og:description" content="{{ meta_description|default('') }}"/>
+    <meta name="twitter:card" content="summary_large_image">
+
+    {% if page is defined %}
+        {% set image = page.assets ? page.assets.firstOfType('image') : null %}
+        {% set transparentNav = page.fields.checkbox|default() ? page.fields.checkbox : false %}
+    {% endif %}
+
+    {% if image|default %}
+        <meta property="og:image" content="{{ app.request.getSchemeAndHttpHost() }}{{ img(image.filename, 1200, 627, 'fit') }}">
+    {% else %}
+        <meta property="og:image" content="{{ app.request.getSchemeAndHttpHost() }}/build/images/acs-default-og-2024.png">
+    {% endif %}
+
+    {% if setting('site_name') %}<meta property="og:site_name" content="{{ setting('site_name') }}">{% endif %}
+    {% if setting('facebook_app_id') %}<meta property="fb:app_id" content="{{ setting('facebook_app_id') }}" />{% endif %}
+    {% if setting('twitter_name') %}<meta property="twitter:site" content="@{{ setting('twitter_name') }}" />{% endif %}
+
+    {% include 'frontend/layout/_favicons.html.twig' %}
+
+    <link href="{{ asset('build/css/app.css') }}" rel="stylesheet" type="text/css"/>
+    {% block stylesheets %}{% endblock %}
+
+    {{ setting('scripts_default')|raw }}
+
+    {% if page.tag|default == 'jobs' or page.contentTypeTag|default == 'job' %}
+        <script>
+            (function(l,e,a,d,i,n,f,o){if(!l[i]){l.GlobalLeadinfoNamespace=l.GlobalLeadinfoNamespace||[];
+                l.GlobalLeadinfoNamespace.push(i);l[i]=function(){(l[i].q=l[i].q||[]).push(arguments)};l[i].t=l[i].t||n;
+                l[i].q=l[i].q||[];o=e.createElement(a);f=e.getElementsByTagName(a)[0];o.async=1;o.src=d;f.parentNode.insertBefore(o,f);}
+            }(window,document,'script','https://cdn.leadinfo.net/ping.js','leadinfo','LI-63DB8D660C75E'));
+        </script>
+    {% endif %}
+</head>
+<body>
+    {% if (app.request.cookies.get('marketingCookie') is same as("true")) %}
+        {{ setting('scripts_marketing')|raw }}
+    {% endif %}
+
+    {% set notice_text = setting('notice_text') %}
+    {% set transparentNav = transparentNav|default(false) %}
+
+    {% include 'frontend/layout/_header.html.twig' %}
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'frontend/layout/_footer.html.twig' %}
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <script src="{{ asset('build/js/app.js') }}"></script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

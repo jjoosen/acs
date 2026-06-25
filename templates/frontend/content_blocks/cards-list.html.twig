@@ -1,0 +1,75 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set cards = block.children %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+<div id="block-{{ block_id }}" class="bg-cards-list">
+    <div class="element-3"></div>
+
+    <section class="cards-list {{ margin_bottom() }}">
+        <div class="container">
+            {% if title or text %}
+                <div class="row mb-5">
+                    <div class="col-8">
+                        {% if title %}
+                            <h2>{{ title }}</h2>
+                        {% endif %}
+
+                        {% if text %}
+                            <div class="text">
+                                {{ text|raw }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if title %}
+                <h2>{{ title }}</h2>
+            {% endif %}
+
+            <div class="row">
+                {% for card in cards %}
+                    {% set title = card.field('title') %}
+                    {% set text = card.field('text') %}
+                    {% set link = card.field('link') %}
+                    {% set image = card.assets.firstOfType('image') %}
+
+                    <div class="col-md-6 col-lg-4 mb-32px">
+                        {% if link %}
+                            <a href="{{ link }}" class="card">
+                        {% else %}
+                            <div class="card" style="pointer-events: none;">
+                        {% endif %}
+                            {% if image %}
+                                {{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                            {% else %}
+                                {{ img_macro.placeholder(title, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                            {% endif %}
+                            <div class="card__body">
+                                <h4 class="card__title">{{ title }}</h4>
+                                {% if text %}
+                                    <div class="card__text">
+                                        {{ text|raw }}
+                                    </div>
+                                {% endif %}
+                                {% if link %}
+                                    <div class="btn btn--arrow btn--arrow-primary">
+                                        {{ "Lees meer"|trans }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% if link %}
+                            </a>
+                        {% else %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>

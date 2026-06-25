@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>content</key>
+
+    <view>pages/content</view>
+    <controller>Sulu\Bundle\WebsiteBundle\Controller\DefaultController::indexAction</controller>
+    <cacheLifetime>604800</cacheLifetime>
+
+    <meta>
+        <title lang="nl">Pagina</title>
+    </meta>
+
+    <properties>
+        <property name="title" type="text_line" mandatory="true">
+            <meta>
+                <title lang="nl">Titel</title>
+            </meta>
+            <tag name="sulu.rlp.part"/>
+        </property>
+
+        <property name="url" type="resource_locator" mandatory="true">
+            <meta>
+                <title lang="nl">Adres</title>
+            </meta>
+            <tag name="sulu.rlp"/>
+        </property>
+
+        <!-- Block-systeem: 1:1 met legacy page_block.tag -->
+        <block name="blocks" default-type="text" minOccurs="0">
+            <meta>
+                <title lang="nl">Inhoudsblokken</title>
+            </meta>
+
+            <types>
+            <!-- ====== text ====== -->
+            <type name="text">
+                <meta><title lang="nl">Tekst</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="title_size" type="single_select">
+                        <params>
+                            <param name="default_value" value="2"/>
+                            <param name="values" type="collection">
+                                <param name="1" value="1"/>
+                                <param name="2" value="2"/>
+                                <param name="3" value="3"/>
+                            </param>
+                        </params>
+                    </property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="center" type="checkbox"><meta><title lang="nl">Gecentreerd</title></meta></property>
+                </properties>
+            </type>
+
+            <!-- ====== banner ====== -->
+            <type name="banner">
+                <meta><title lang="nl">Banner</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="height" type="text_line"><meta><title lang="nl">Hoogte (css)</title></meta></property>
+                    <property name="text_size" type="text_line"><meta><title lang="nl">Tekstgrootte</title></meta></property>
+                    <property name="no_bottom_margin" type="checkbox"><meta><title lang="nl">Geen ondermarge</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Achtergrondafbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== text_image ====== -->
+            <type name="text_image">
+                <meta><title lang="nl">Tekst + afbeelding</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="img_left" type="checkbox"><meta><title lang="nl">Afbeelding links</title></meta></property>
+                    <property name="img_small" type="checkbox"><meta><title lang="nl">Kleine afbeelding</title></meta></property>
+                    <property name="scroll_reveal" type="checkbox"><meta><title lang="nl">Scroll reveal</title></meta></property>
+                    <property name="images" type="media_selection">
+                        <meta><title lang="nl">Afbeeldingen</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== usps ====== -->
+            <type name="usps">
+                <meta><title lang="nl">USP's</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="bg_color" type="text_line"><meta><title lang="nl">Achtergrondkleur</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Afbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== image ====== -->
+            <type name="image">
+                <meta><title lang="nl">Afbeelding</title></meta>
+                <properties>
+                    <property name="compact" type="checkbox"><meta><title lang="nl">Compact</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Afbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== quote ====== -->
+            <type name="quote">
+                <meta><title lang="nl">Quote</title></meta>
+                <properties>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="text_small" type="text_line"><meta><title lang="nl">Subtekst</title></meta></property>
+                    <property name="center" type="checkbox"><meta><title lang="nl">Gecentreerd</title></meta></property>
+                </properties>
+            </type>
+            </types>
+        </block>
+    </properties>
+</template>

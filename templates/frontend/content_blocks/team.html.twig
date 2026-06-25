@@ -1,0 +1,61 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set members = block.children %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% if members %}
+    <div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+        <div class="row mb-3">
+            <div class="col-lg-7">
+                {% if title %}
+                    <h2 class="mb-1">{{ title }}</h2>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row text-center text-sm-left">
+            {% for member in members %}
+                {% set title = member.field('title') %}
+                {% set function = member.field('function') %}
+                {% set email = member.field('email') %}
+                {% set phone = member.field('phone') %}
+                {% set image = member.assets.firstOfType('image') %}
+
+                <div class="col-lg-6 mb-3 pb-1">
+                    {% if image %}
+                        {{ img_macro.picture(image, 140, 140, 'fit', 'smart', 85, 'mw-100 d-inline-block rounded-circle align-top mr-sm-3') }}
+                    {% endif %}
+
+                    <div class="d-inline-block font-size-16">
+                        <h3 class="mb-0">{{ title }}</h3>
+                        <div>{{ function }}</div>
+
+                        <div class="mt-1">
+                            {% if email %}
+                                <a href="mailto:{{ email }}" onclick="plausible('click_mailadres')" class="d-block text-decoration-none">
+                                    <i class="icon icon-email mr-10px"></i> {{ email }}
+                                </a>
+                            {% endif %}
+
+                            {% if phone %}
+                                <a href="tel:{{ phone|replace({' ': ''}) }}" onclick="plausible('click_telefoonnummer')" class="d-block">
+                                    <i class="icon icon-phone mr-10px"></i> {{ phone }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

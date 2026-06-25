@@ -1,0 +1,57 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+    {% set images = block.assets.getByType('image') %}
+    {% set img_left = block.field('img_left') %}
+    {% set img_small = block.field('img_small') %}
+    {% set scroll_reveal = block.field('scroll_reveal') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% set image = page.assets ? page.assets.firstOfType('image') : null %}
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+    <div class="row align-items-center justify-content-between">
+        <div class="col-lg-{% if img_small %}7{% else %}5{% endif%} {% if img_left %}order-md-1{% else %}mb-2 mb-lg-0{% endif %}">
+            {% if title %}
+                <h{{ title_size|default(2) }}>{{ title }}</h{{ title_size|default(2) }}>
+            {% endif %}
+
+            {% if text %}
+                <div class="text">
+                    {{ text|raw }}
+                </div>
+            {% endif %}
+
+            {% include '/frontend/content_blocks/partials/_buttons.html.twig' %}
+        </div>
+        <div class="col-lg-{% if img_small %}4{% else %}6{% endif%} text-center {% if img_left %}mb-3 mb-lg-0{% endif %}">
+            {% if images and images|length == 1 %}
+                {% if scroll_reveal %}
+                    {{ img_macro.picture(images[0], 550, 400, 'fit', 'smart', 85, 'rounded w-100 js-scroll-reveal') }}
+                {% else %}
+                    {{ img_macro.picture(images[0], 550, 400, 'fit', 'smart', 85, 'rounded w-100') }}
+                {% endif %}
+            {% else %}
+                {% if scroll_reveal %}
+                    <div class="d-flex flex-column flex-md-row justify-content-end position-relative mb-5 js-scroll-reveal">
+                        {{ img_macro.picture(images[0], 400, 475, 'fill', 'smart', 85, 'rounded img-fluid mb-1') }}
+                        {% if images|length > 1 %}
+                            {{ img_macro.picture(images[1], 475, 350, 'fill', 'smart', 85, 'rounded img-fluid img-absolute') }}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="d-flex flex-column flex-md-row justify-content-end position-relative mb-5">
+                        {{ img_macro.picture(images[0], 400, 475, 'fill', 'smart', 85, 'rounded img-fluid mb-1') }}
+                        {% if images|length > 1 %}
+                            {{ img_macro.picture(images[1], 475, 350, 'fill', 'smart', 85, 'rounded img-fluid img-absolute') }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            {% endif %}
+        </div>
+    </div>
+</div>

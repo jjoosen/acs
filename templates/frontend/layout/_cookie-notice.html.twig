@@ -1,0 +1,46 @@
+<form class="cookie-notice" id="cookie-notice" data-url="{{ url('frontend.scripts') }}">
+    <div class="cookie-notice__message mb-1">
+        <h3 class="cookie-notice__title">{{ 'Beleef meer dankzij cookies'|trans }}</h3>
+        <div class="mb-1">
+            <p class="mb-0">
+                {{ setting('cookie_notice') }}
+                {% set cpPage = get_page_by_tag('cookie_policy') %}
+                {% if cpPage.url %}
+                    <a href="{{ cpPage.url }}">{{ 'Lees meer'|trans }}</a>
+                {% endif %}
+            </p>
+
+        </div>
+    </div>
+    <div class="cookie-notice__settings">
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   id="functional-cookies"
+                   name="functional-cookies"
+                   value="functionalCookie"
+                   checked
+                   disabled
+            >
+            <label class="custom-control-label cookie-notice__label"
+                   for="functional-cookies">{{ 'Functionele cookies'|trans }}</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   id="marketing-cookies"
+                   name="marketing-cookies"
+                   value="marketingCookie"
+            >
+            <label class="custom-control-label cookie-notice__label"
+                   for="marketing-cookies">{{ 'Marketing cookies'|trans }}</label>
+        </div>
+    </div>
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2">
+        <button class="btn btn--primary px-1 ml-5px order-sm-1"
+                id="save-cookie-preferences"
+                data-alternate-text="{{ 'Wijzigingen opslaan'|trans }}"
+        >{{ 'Alles accepteren'|trans }}</button>
+        <a href="#" class="small mr-5px mt-1 mt-sm-0 text-muted" id="decline-cookies">{{ 'Minimale cookies aanvaarden'|trans }}</a>
+    </div>
+</form>

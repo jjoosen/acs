@@ -1,0 +1,46 @@
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<section class="news-list {{ margin_bottom() }}">
+	<div class="container">
+		<div class="row">
+            {% set items = get_content('job_news', pageNumber|default(1), 12, {}, 'sortIndex') %}
+
+            {% for news_item in items %}
+				<div class="col-sm-6 col-xl-4 mb-32px d-flex">
+					{% if news_item.field('external_link') %}
+						{% set url = news_item.field('external_link') %}
+					{% else %}
+						{% set url = news_item.url %}
+					{% endif %}
+
+					<a href="{{ url }}" {% if news_item.field('external_link') %} target="_blank" {% endif %} class="card w-100">
+						{% set image = news_item.assets.firstOfType('image') %}
+						{% if image %}
+							{{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+						{% else %}
+							{{ img_macro.placeholder(news_item.name, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+						{% endif %}
+						<div class="card__body">
+							<h4 class="card__title mb-0">{{ news_item.name }}</h4>
+							<div class="font-size-14 opacity-70 mb-1">
+								{{ "Gepost op"|trans }}
+								<time datetime="{{ news_item.publishDate|date('Y-m-d') }}">{{ news_item.publishDate|localizeddate('none', 'none', app.request.locale, null, 'd MMMM Y') }}</time>
+							</div>
+
+							{% if news_item.field('short') %}
+								<div class="card__text">
+									{{ news_item.field('short')|raw }}
+								</div>
+							{% endif %}
+							<div class="btn btn--arrow btn--arrow-primary">
+								{{ "Lees meer"|trans }}
+							</div>
+						</div>
+					</a>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</section>
+
+#}

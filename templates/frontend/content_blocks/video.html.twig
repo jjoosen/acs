@@ -1,0 +1,55 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+    {% set video = block.assets.firstOfType('video') %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set youtube_id = block.field('youtube_id') %}
+    {% set no_breadcrumbs = block.field('no_breadcrumbs')|default %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<div id="block-{{ block_id }}">
+    <div class="container mb-6">
+        <div class="row text-center justify-content-center">
+            <div class="col-md-10 col-lg-8 my-3 my-lg-4">
+                {% if title %}
+                    <h{{ title_size|default(2) }} class="h2">{{ title }}</h{{ title_size|default(2) }}>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text text-primary">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-12 mb--100px">
+                {% if not no_breadcrumbs %}
+                <div class="mb-2">
+                    {% include '/frontend/layout/_breadcrumbs.html.twig' %}
+                </div>
+                {% endif %}
+                {% if video %}
+                    <video width="100%" controls class="rounded box-shadow" {% if image %}poster="{{ img(image.getFilename(), 1600, 900, 'fill', 'smart', 85) }}{% endif %}">
+                        <source src="{{ view_file_link(video.id) }}" type="video/mp4">
+                        {% if image %}
+                            <img src="{{ img(image.getFilename(), 1600, 900) }}" alt="{{ 'Uw browser ondersteunt geen video\'s'|trans }}">
+                        {% endif %}
+                    </video>
+                {% elseif youtube_id %}
+                    <div class="embed-responsive embed-responsive-16by9 rounded box-shadow">
+                        <iframe class="embed-responsive-item"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                src="https://www.youtube.com/embed/{{ youtube_id }}?enablejsapi=1"></iframe>
+                    </div>
+                {% elseif image %}
+                    {{ img_macro.picture(image, 1600, 900, 'fit', 'smart', 85, 'rounded box-shadow w-100') }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

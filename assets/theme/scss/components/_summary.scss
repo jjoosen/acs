@@ -1,0 +1,15 @@
+.summary {
+  &__item {
+
+  }
+
+  &__dot {
+    height: 4rem;
+    width: 4rem;
+    background-color: #E1EFF8;
+    border-radius: 50%;
+    display: inline-block;
+    color: $primary;
+    font-weight: bold;
+  }
+}

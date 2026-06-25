@@ -1,0 +1,17 @@
+{# Sulu block: usps — geport van legacy content_blocks/usps.html.twig #}
+{% set image = (block.image|default([]))|first %}
+<div class="usps {{ margin_bottom() }}" {% if block.bg_color|default %}style="background-color: {{ block.bg_color }}"{% endif %}>
+    <div class="container py-4">
+        <div class="row align-items-center">
+            {% if image %}
+                <div class="col-md-4">
+                    <img class="img-fluid" src="{{ img(image, 400, 400) }}" alt="{{ image.title }}" loading="lazy">
+                </div>
+            {% endif %}
+            <div class="{% if image %}col-md-8{% else %}col-12{% endif %}">
+                {% if block.title|default %}<h2>{{ block.title }}</h2>{% endif %}
+                {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>

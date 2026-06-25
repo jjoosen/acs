@@ -1,0 +1,64 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_2 = block.field('title_2') %}
+    {% set text = block.field('text') %}
+    {% set contact_name = block.field('contact_name') %}
+    {% set contact_email = block.field('contact_email') %}
+    {% set contact_phone = block.field('contact_phone') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+    {% if title %}
+        <h2 class="d-flex align-items-center">{{ title }}<span class="count ml-10px">{{ count_jobs('job') }}</span></h2>
+    {% endif %}
+
+    {% set jobs = get_content('job', pageNumber|default(1), 99, {}, 'sortIndex') %}
+
+    <div class="row">
+        <div class="col-lg-7 col-xl-8 mb-3 mb-lg-0">
+            <div class="rounded-lg border mb-2 mb-lg-3" id="jobs-list">
+                {% for job in jobs %}
+                    {% if job.fields.inactive|default == false %}
+                        <a href="{{ job.url }}" class="job align-items-center text-dark{% if loop.index > 4 %} d-none {% else %} d-flex {% endif %} justify-content-between p-2 text-decoration-none flex-wrap flex-sm-nowrap">
+                            <div class="">
+                                <h3 class="mb-0 font-size-20 text-dark">{{ job.name }}</h3>
+                                <div class="font-size-16">{{ job.field('description')|raw }}</div>
+                            </div>
+                            <div class="text-sm-right">
+                                <div class="font-size-16">
+                                    <span class="align-middle font-weight-bold">
+                                        {% for tag in job.tags.all %}
+                                            {{ tag.name }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    <i class="icon icon-pin font-size-20 text-secondary position-relative" style="top: -2px"></i>
+                                </div>
+                            </div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if jobs|length > 4 %}
+                <div class="text-center">
+                    <div id="js-load-more-trigger"
+                         data-target="jobs-list"
+                         data-loading="false"
+                         class="btn btn--secondary"
+                    >
+                        {{ "Toon meer vacatures"|trans }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-5 col-xl-4">
+            <div class="ml-lg-3">
+                {% include '/frontend/content_blocks/partials/_sidebar-block-text.html.twig' %}
+            </div>
+        </div>
+    </div>
+</div>

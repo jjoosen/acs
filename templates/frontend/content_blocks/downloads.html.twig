@@ -1,0 +1,61 @@
+{% set downloads = block.children %}
+{% set title = block.getField('title') %}
+{% set text = block.getField('text') %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% if downloads %}
+    <div class="{{ margin_bottom() }}">
+        <div class="container">
+            {% if title or text %}
+                <div class="row">
+                    <div class="col-lg-10">
+                        <div class="mb-3">
+                            {% if title %}
+                                <h2>{{ title }}</h2>
+                            {% endif %}
+                            {% if text %}
+                                <div class="text">{{ text|raw }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                {% for item in downloads %}
+                    {% set image = item.assets.firstOfType('image') %}
+                    {% set download = item.assets.firstOfType('download') %}
+                    {% set title = item.field('title') %}
+                    {% set text = item.field('text') %}
+                    <div class="col mb-2">
+                        <div class="card">
+                            {% if image %}
+                                {{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                            {% endif %}
+                            <div class="card__body">
+                                {% if title %}
+                                    <h3 class="h3 card__title">{{ title }}</h3>
+                                {% endif %}
+                                {% if text %}
+                                    <div class="card__text mb-2">
+                                        {{ text|raw }}
+                                    </div>
+                                {% endif %}
+                                {% if download %}
+                                <a href="{{ download_file_link(download.id) }}"
+                                   class="btn btn--primary">
+                                    <i class="icon icon-download font-size-20"></i>
+                                    {{ "Downloaden"|trans }}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}

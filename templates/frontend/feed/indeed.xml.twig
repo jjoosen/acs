@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<source>
+    <publisher>Ac|s Accountants</publisher>
+    <publisherurl>https://www.acsac.eu/</publisherurl>
+    <lastBuildDate>{{ 'now'|date('D, d M Y H:i:s T') }}</lastBuildDate>
+    {% for item in content %}
+        {% set job = item.job %}
+        {% set translation = job.translations.first %}
+
+        {% for location in job.tags %}
+            {% set city = location.translations.first.name %}
+
+            <job>
+                <title><![CDATA[{{ translation.name }}]]></title>
+                <date><![CDATA[{{ 'now'|date('D, d M Y H:i:s T') }}]]></date>
+                <referencenumber><![CDATA[job_{{ job.id }}]]></referencenumber>
+                <url>
+                    <![CDATA[https://www.acsac.eu/vacatures/{{ translation.url }}]]>
+                </url>
+                <company><![CDATA[Ac|s Accountants]]></company>
+                <sourcename><![CDATA[Ac|s Accountants]]></sourcename>
+
+                <city><![CDATA[{{ city }}]]></city>
+                <country><![CDATA[BE]]></country>
+                <postalcode><![CDATA[{{ locations[city].zipCode }}]]></postalcode>
+                <streetaddress><![CDATA[{{ locations[city].street }}]]></streetaddress>
+                <email><![CDATA[{{ locations[city].email }}]]></email>
+
+                <description>
+                    <![CDATA[{{ item.html|raw }}]]>
+                </description>
+
+                <experience><![CDATA[{{ item.experience }}]]></experience>
+                <jobtype><![CDATA[{{ item.type }}]]></jobtype>
+
+                {#
+                <salary><![CDATA[$50K per year]]></salary>
+                <education><![CDATA[Bachelors]]></education>
+
+                <category><![CDATA[Category1, Category2, CategoryN]]></category>
+
+                <expirationdate><![CDATA[Mon, 08 Nov 2021]]></expirationdate>
+                <remotetype><![CDATA[COVID-19]]></remotetype>
+                <indeed-apply-data>COVERED IN A LATER SECTION</indeed-apply-data>
+                #}
+            </job>
+        {% endfor %}
+    {% endfor %}
+</source>

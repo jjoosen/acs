@@ -1,0 +1,35 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set title_size = block.field('title_size') %}
+    {% set text = block.field('text') %}
+    {% set center = block.field('center'|default(false)) %}
+
+    {% set element_rotation = block.field('element_rotation')|default(0) %}
+    {% set element_position = block.field('element_position')|default(false) %}
+    {% set element = block.field('element')|default(0) %}
+    {% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="text-element-bg">
+    {% if element and element > 0 %}
+        <div class="element-{{ element }} {% if element_position %}{{ element_position }}{% endif %}"{% if element_rotation and element_rotation > 0 %}style="transform: rotate({{ element_rotation }}deg);"{% endif %}></div>
+    {% endif %}
+
+    <div class="container {{ margin_bottom() }} {% if center %}text-center{% endif %}">
+        <div class="row">
+            <div class="col-12 mt-3">
+                {% if title %}
+                    <h{{ title_size|default(2) }}>{{ title }}</h{{ title_size|default(2) }}>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+
+                {% include '/frontend/content_blocks/partials/_buttons.html.twig' %}
+            </div>
+        </div>
+    </div>
+</div>

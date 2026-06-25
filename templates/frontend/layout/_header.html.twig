@@ -1,0 +1,141 @@
+{% set top_nav = navigation('top', true, true) %}
+{% set main_nav = navigation('main', true, true) %}
+
+    {% if top_nav %}
+        <nav class="{% if transparentNav %}top-nav-trans {% else %} top-nav {% endif %} d-none d-lg-block">
+            <div class="container d-flex justify-content-between">
+
+                <div class="{% if transparentNav %}top-nav-trans__link {% else %} top-nav__link {% endif %} d-inline-block">
+                    {% if notice_text|default %}
+                        {% if notice_text|default %}
+                            {% include 'frontend/content_blocks/partials/_notice.html.twig' %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="d-none d-lg-block">
+                    <ul class="{% if transparentNav %}top-nav-trans__list {% else %} top-nav__list {% endif %}list-unstyled">
+                        {% for item in top_nav %}
+                            <li class="{% if transparentNav %}top-nav-trans__item {% else %} top-nav__item {% endif %} d-inline-block">
+                                <a href="{{ item.url }}"
+                                   class="{% if transparentNav %}top-nav-trans__link {% else %} top-nav__link {% endif %}text-tertiary d-inline-block {% if item.url in app.request.uri %}is-active{% endif %} {% if item.tag %}top-nav__link--{{ item.tag }}{% endif %}"
+                                   {% if item.url starts with 'http' %}target="_blank" rel="noopener"{% endif %}
+                                >{{ item.name }}{% if item.tag == 'jobs' %}<span
+                                            class="top-nav__count">{{ count_jobs()}}</span>{% endif %}
+                                </a>
+
+                                {% if not loop.last %}
+                                    |
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endif %}
+
+<div class="{% if transparentNav %}main-nav-trans__container {% else %} main-nav__container{% endif %} sticky-top ">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/" class="page-header__logo">
+            {% if transparentNav %}
+                <img class="img-fluid"
+                     src="{{ asset('/build/images/logo-white-alt.png') }}"
+                     srcset="{{ asset('/build/images/logo-white-alt@2x.png') }} 2x"
+                     alt="{{ setting('site_name') }}"
+                     id="logo-nav-white"
+                >
+                <img class="img-fluid d-none"
+                     src="{{ asset('/build/images/logo.png') }}"
+                     srcset="{{ asset('/build/images/logo@2x.png') }} 2x"
+                     alt="{{ setting('site_name') }}"
+                     id="logo-nav"
+                >
+            {% else %}
+                <img class="img-fluid"
+                     src="{{ asset('/build/images/logo.png') }}"
+                     srcset="{{ asset('/build/images/logo@2x.png') }} 2x"
+                     alt="{{ setting('site_name') }}"
+                >
+            {% endif %}
+        </a>
+
+        {% if main_nav %}
+            <nav class="{% if transparentNav %}main-nav-trans {% else %} main-nav {% endif %}d-none d-lg-block">
+                <ul class="{% if transparentNav %}main-nav-trans__list  {% else %} main-nav__list {% endif %}list-unstyled">
+                    {% for item in main_nav %}
+                        <li class="{% if transparentNav %}main-nav-trans__item {% else %} main-nav__item {% endif %}{% if item.children %}has-subnav{% endif %}">
+                            <a href="{{ item.url }}"
+                               class="{% if transparentNav %}main-nav-trans__link {% else %} main-nav__link{% endif %}{% if item.url in app.request.uri %}is-active{% endif %} {% if item.tag == "button" %}btn btn--color-4 ml-1 ml-xl-2{% else %}p-xl-2{% endif %}">{{ item.name }}</a>
+
+                            {% if item.children %}
+                                <nav class="sub-nav ">
+                                    <ul class="sub-nav__list list-unstyled rounded">
+                                        {% for child in item.children %}
+                                            <li class="sub-nav__item">
+                                                <a href="{{ child.url }}"
+                                                   class="sub-nav__link {% if child.url in app.request.uri %}is-active{% endif %}">{{ child.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </nav>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+
+            <button class="hamburger hamburger--vortex js-hamburger d-lg-none" type="button" title="MENU">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+{% if main_nav %}
+    <nav class="js-nav mobile-nav d-lg-none d-flex justify-content-center align-items-center">
+        <ul class="mobile-nav__list list-unstyled mt-3">
+            {% for item in main_nav %}
+                <li class="mobile-nav__item {% if item.children %}has-subnav{% endif %}">
+                    <a href="{{ item.url }}"
+                       class="mobile-nav__link text-decoration-none d-inline-block py-5px {% if item.tag == 'button' %}btn btn--tertiary py-10px border my-1{% endif %} {% if app.request.uri ends with item.url %}is-active{% endif %}">
+                        {{ item.name }}
+                    </a>
+
+                    {% if item.children %}
+                        <nav class="mobile-sub-nav ml-10px">
+                            <ul class="mobile-sub-nav__list list-unstyled">
+                                {% for child in item.children %}
+                                    <li class="mobile-sub-nav__item">
+                                        <a href="{{ child.url }}" title="{{ child.name }}"
+                                           class="mobile-sub-nav__link p-5px d-block text-decoration-none {% if child.url in app.request.uri %}is-active{% endif %}">
+                                            {{ child.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </li>
+            {% endfor %}
+
+            {% for item in top_nav %}
+                <li class="mobile-nav__item {% if item.children %}has-subnav{% endif %} {% if loop.first %}border-top pt-1{% endif %}">
+                    <a href="{{ item.url }}"
+                       class="mobile-nav__link text-decoration-none d-inline-block py-5px {% if item.tag == 'button' %}btn btn--tertiary py-10px border my-1{% endif %} {% if not item.children and item.url in app.request.uri %}is-active{% endif %}">
+                        {{ item.name }}
+                    </a>
+                </li>
+            {% endfor %}
+            {% if notice_text|default %}
+                <div>
+                    {% if notice_text|default %}
+                        {% include 'frontend/content_blocks/partials/_notice.html.twig' %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}

@@ -1,0 +1,14 @@
+.search-box {
+  position: relative;
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+  }
+
+  &__input {
+    padding-right: 40px;
+  }
+}

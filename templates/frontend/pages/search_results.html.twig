@@ -1,0 +1,49 @@
+{% extends 'frontend/base.html.twig' %}
+{% import 'frontend/macros/search.html.twig' as search %}
+{% set newsPage = get_page_by_tag('news') %}
+{% set clientzonePage = get_page_by_tag('clientzone') %}
+{% set button_url = {'pages': clientzonePage.url, 'news': clientzonePage.url} %}
+{% set button_text = {'pages': 'klantzone', 'news': 'nieuws'} %}
+
+{% block content %}
+    <div class="bg-white-50 min-height">
+        <div class="container py-3 pb-lg-4">
+            <div class="row">
+                <div class="col-lg-11 offset-1">
+                    {% if t == "pages" %}
+                        {{ search.searchBarHeader() }}
+                    {% else %}
+                        {{ search.searchBar() }}
+                    {% endif %}
+                    <h1 class="mt-2">{{ 'Zoekresultaten'|trans }}</h1>
+
+                    <div>
+                        {% if not searchResults|length %}
+                            <div class="text">
+                                <p class="mb-30px">{{ 'Geen resultaten voor <em>&ldquo;%search_string%&rdquo;</em>.'|trans({'%search_string%': q})|raw }}</p>
+                            </div>
+                            {% if t == "pages" %}
+
+                            {% endif %}
+                            <a href="{{ button_url[t] }}" class="btn btn--primary">{{ 'Terug naar'|trans }} {{ button_text[t] }}</a>
+                        {% else %}
+                            <div class="text">
+                                <p class="mb-30px">{{ 'Je resultaten voor <em>&ldquo;%search_string%&rdquo;</em>:'|trans({'%search_string%': q})|raw }}</p>
+                                {% for result in searchResults %}
+                                    <div>
+                                        <a href="{{ result.url }}" class="h5">{{ result.title|raw }}</a>
+                                        <br>
+                                        {{ result.desc|raw }}
+                                    </div>
+                                    {% if not loop.last %}
+                                        <hr>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,123 @@
+@font-face {
+  font-family: "Massilia";
+  src: url('../fonts/massilia/Massilia-ExtraLight.woff2'),
+  url('../fonts/massilia/Massilia-ExtraLight.woff2') format('woff2'),
+  url('../fonts/massilia/Massilia-ExtraLight.woff') format('woff'),
+  url('../fonts/massilia/Massilia-ExtraLight.otf') format("opentype");
+}
+
+@font-face {
+  font-family: "Area";
+  src: url('../fonts/area/AreaNormal-Regular.woff2'),
+  url('../fonts/area/AreaNormal-Regular.woff2') format('woff2'),
+  url('../fonts/area/AreaNormal-Regular.woff') format('woff'),
+  url('../fonts/area/AreaNormal-Regular.otf') format("opentype");
+}
+
+@font-face {
+  font-family: "Area";
+  src: url('../fonts/area/AreaNormal-Bold.woff2'),
+  url('../fonts/area/AreaNormal-Bold.woff2') format('woff2'),
+  url('../fonts/area/AreaNormal-Bold.woff') format('woff'),
+  url('../fonts/area/AreaNormal-Bold.otf') format("opentype");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Area";
+  src: url('../fonts/area/AreaNormal-Extrabold.woff2'),
+  url('../fonts/area/AreaNormal-Extrabold.woff2') format('woff2'),
+  url('../fonts/area/AreaNormal-Extrabold.woff') format('woff'),
+  url('../fonts/area/AreaNormal-Extrabold.otf') format("opentype");
+  font-weight: 700;
+}
+
+/* General */
+$font-size: 16px;
+$font-family-base: 'Area', sans-serif;
+$headings-font-family: 'Massilia', sans-serif;
+
+/* Transitions */
+$ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$transition: 175ms $ease-out-quad;
+
+/* Colors */
+$color-1: #282165;
+$color-2: #009cdf;
+$color-3: #74ab3e;
+$color-4: #34a3b6;
+$color-danger: red; // CHANGE THIS
+$color-dark: #1b1b1c;
+// $color-text: $color-dark;
+$color-text: $color-1;
+$color-light: #fff;
+$color-light-blue: #e1eff8;
+$link-hover-color: $color-2;
+
+/* Bootstrap variables */
+$primary: $color-1;
+$secondary: $color-2;
+$danger: $color-danger;
+$light: $color-light;
+$h1-font-size: 46px;
+$h2-font-size: 32px;
+$h3-font-size: 24px;
+$h4-font-size: 18px;
+$h5-font-size: 18px; // CHANGE THIS
+$h6-font-size: $font-size; // CHANGE THIS
+$headings-margin-bottom: 15px;
+$border-radius: 8px;
+$border-radius-sm: $border-radius;
+$border-radius-lg: 8px;
+//$grid-gutter-width: 18px;
+$grid-gutter-width: 32px;
+$spacers: ( // See: https://getbootstrap.com/docs/4.1/utilities/spacing/
+      0: 0,
+      1: 15px,
+      2: 20px,
+      3: 40px,
+      4: 80px,
+      5: 100px,
+      6: 180px,
+      5px: 5px,
+      10px: 10px,
+      30px: 30px,
+      32px: 32px,
+);
+
+$grid-breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1250px
+);
+
+$container-max-widths: (
+        sm: 540px,
+        md: 720px,
+        lg: 960px,
+        xl: 1190px
+);
+
+// Bootstrap Forms
+$input-placeholder-color: rgba($color-text, 0.8);
+$input-color: $color-text;
+$input-border-width: 1px;
+$input-focus-box-shadow: none;
+$input-padding-y: 0.55rem;
+$input-btn-font-size: 16px;
+$input-font-size: 16px;
+//$input-padding-x: 0.6rem;
+//$input-height-inner: 1rem;
+//$input-line-height: 1.5;
+//$input-padding-y-sm: $input-padding-y;
+//$input-padding-x-sm: $input-padding-x;
+//$input-line-height-sm: $input-line-height;
+//$input-padding-y-lg: $input-padding-y;
+//$input-padding-x-lg: $input-padding-x;
+//$input-line-height-lg: $input-line-height;
+
+
+// Hamburger
+$hamburger-layer-color: $color-text;

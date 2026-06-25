@@ -1,0 +1,64 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set list_items = block.children %}
+    {% set nomb = block.field('no_bottom_margin'|default(false)) %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<section id="block-{{ block_id }}" class="{% if nomb == true %} mb-0 {% else %} {{margin_bottom()}} {% endif %}">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% if title %}
+                <div class="col-12  mb-1">
+                    <h2 class="mb-0">{{ title }}</h2>
+                </div>
+            {% endif %}
+
+            <div class="col-12 ">
+                <div class="rounded box-shadow bg-primary px-1 px-md-3">
+                    {% for item in list_items %}
+                        {% set title = item.field('title') %}
+                        {% set text = item.field('text') %}
+
+                        {% if title and text %}
+                            <div class="font-size-18 {% if not loop.last %}border-bottom{% endif %}">
+                                <div data-toggle="collapse" data-target="#collapsable-{{ item.id }}" class="collapsed cursor-pointer py-2 font-weight-bold w-100 d-flex justify-content-between align-items-center text-white">
+                                    {{ title }}
+                                    <i class="icon icon-minus text-white collapse-caret font-size-20"></i>
+                                </div>
+
+                                <div class="collapse" id="collapsable-{{ item.id }}">
+                                    <div class="text text-white pb-2">
+                                        {{ text|raw }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+    {% for item in list_items %}
+    {
+        "@type": "Question",
+        "name": "{{ item.field('title') }}",
+        "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{{ item.field('text')|striptags|trim }}"
+        }
+    }
+    {% if not loop.last %},{% endif %}
+    {% endfor %}
+    ]
+}
+</script>

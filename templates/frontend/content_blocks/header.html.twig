@@ -1,0 +1,71 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set youtube_id = block.field('youtube_id') %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set video = block.assets.firstOfType('video') %}
+    {% set navigation = block.children|filter(child => child.realtag == 'navigation') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<header id="block-{{ block_id }}" class="header {% if transparentNav %}header-trans {% endif%}position-relative {% if video and not transparentNav %} add-background{% endif %}">
+    <div class="background-effect"></div>
+
+    <div class="header__video-container background-cover background-center position-absolute h-100 w-100 filter-contrast-60 overflow-hidden"
+         {% if image and not video %}style="background-image: url({{ img(image.filename, 1440, 800, 'fill') }})"{% endif %}
+    >
+        {% if video %}
+            <video autoplay muted playsinline loop class="box-shadow header__video"
+                   {% if image %}poster="{{ img(image.getFilename(), 1440, 800, 'fill', 'smart', 85) }}"{% endif %}
+            >
+                <source src="{{ view_file_link(video.id) }}" type="video/mp4">
+            </video>
+        {% elseif youtube_id %}
+            <div class="embed-responsive embed-responsive-16by9 rounded box-shadow">
+                <iframe class="embed-responsive-item"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        src="https://www.youtube.com/embed/{{ youtube_id }}?playlist={{ youtube_id }}&enablejsapi=1&autoplay=1&mute=1&controls=0&showinfo=0&autohide=0&modestbranding=1&loop=1"></iframe>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <div class="container {% if transparentNav %}header-trans__content {% endif%} header__content text-white">
+        <div class="row align-items-center h-100">
+            <div class="{% if video and not transparentNav %}col-md-6 col-lg-5 col-xl-4{% else %}col-md-8 col-xl-5{% endif %}">
+                {% if title %}
+                    <h1 class="header__title">{{ title }}</h1>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text header__text">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+
+                {% include '/frontend/content_blocks/partials/_buttons.html.twig' %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container {{ margin_bottom() }} header-nav">
+    <div class="row no-gutters box-shadow rounded mt--45px overflow-hidden">
+        {% for nav_item in navigation %}
+            {% set title = nav_item.field('title') %}
+            {% set text = nav_item.field('text') %}
+            {% set link = nav_item.field('link') %}
+
+            <div class="col-sm-6 col-lg bg-white">
+                <a href="{{ link }}" class="header__nav-item d-block text-decoration-none h-100">
+                    <h4 class="mb-0">{{ title }}</h4>
+                    <div class="font-size-14 text-dark">{{ text }}</div>
+                </a>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+

@@ -1,0 +1,6 @@
+{% import 'frontend/macros/sidebar.html.twig' as sidebar %}
+
+{{ sidebar.text_block(block.field('title'), block.field('text'), block.field('subtitle'), block.field('email'), block.field('phone'), block.assets.firstOfType('image')) }}
+
+
+

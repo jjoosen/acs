@@ -1,0 +1,28 @@
+{% macro picture(image, width, height, type = 'fill', position = 'smart', quality = '85', class) %}
+    {% set _1x = img(image.getFilename(), width, height, type, position, quality) %}
+    {% set _2x = img(image.getFilename(), width * 2, height * 2, type, position, quality) %}
+
+    <img {% if class %}class="{{ class }}"{% endif %}
+         src="{{ _1x }}"
+         srcset="{{ _2x }} 2x"
+         alt="{{ image.title }}"
+         loading="lazy"
+    >
+{% endmacro %}
+
+{% macro placeholder(title, width, height, type = 'fill', position = 'smart', quality = '85', class, imageUrl = '/public/build/images/placeholder.jpg') %}
+    {% set _1x = img(imageUrl, width, height, type, position, quality) %}
+    {% set _2x = img(imageUrl, width * 2, height * 2, type, position, quality) %}
+
+    <img {% if class %}class="{{ class }}"{% endif %}
+         src="{{ _1x }}"
+         srcset="{{ _2x }} 2x"
+         alt="{{ title }}"
+         loading="lazy"
+    >
+{% endmacro %}
+
+{% macro background(image, width, height, type = 'fill', position = 'smart', quality = '85') %}
+    {% set _1x = img(image.getFilename(), width, height, type, position, quality) %}
+    background-image: url({{ _1x }});
+{% endmacro %}

@@ -1,0 +1,117 @@
+/**
+General text
+ */
+
+body {
+  font-size: $font-size;
+  font-family: $font-family-base;
+  line-height: 1.6;
+  color: $color-text;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  color: $color-1;
+  font-weight: bold;
+}
+
+h1, .h1 {
+  line-height: 64.2px;
+  color: white;
+  font-size: 2.6rem;
+
+  @include media-breakpoint-down(md) {
+    font-size: 34px;
+    line-height: 48px;
+  }
+}
+
+h2, .h2 {
+  line-height: 48px;
+
+  @include media-breakpoint-down(md) {
+    font-size: 24px
+  }
+}
+
+h3, .h3 {
+  line-height: 32.6px;
+
+  @include media-breakpoint-down(md) {
+
+  }
+}
+
+h4, .h4 {
+  line-height: 26px;
+
+  @include media-breakpoint-down(md) {
+
+  }
+}
+
+h5, .h5 {
+
+  @include media-breakpoint-down(md) {
+
+  }
+}
+
+p {
+  margin-bottom: 30px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+a[href^="tel:"] {
+  text-decoration: none !important;
+}
+
+// User inputted texts
+.text {
+  a {
+    color: $color-2;
+    text-decoration: underline;
+
+    &:hover, &:focus {
+      text-decoration: underline;
+      color: $color-text;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 20px;
+
+    li {
+      position: relative;
+      padding-left: 27px;
+
+      &:before {
+        content: "";
+        background: $color-2;
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        top: 10px;
+        left: 0;
+        margin: auto;
+      }
+    }
+  }
+}
+
+.text-light {
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: #fff;
+  }
+}
+
+.big-text {
+  font-weight: 600;
+  font-size: 1.5rem;
+}

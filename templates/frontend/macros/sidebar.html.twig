@@ -1,0 +1,41 @@
+
+{% macro text_block(title, text, subtitle, email, phone,image) %}
+
+    <div class="box-shadow rounded bg-white">
+        <div class="bg-tertiary rounded-top py-2 px-3">
+            {% if title %}
+                <h3 class="text-white mb-0">{{ title }}</h3>
+            {% endif %}
+        </div>
+        {% if image %}
+            {% import 'frontend/macros/images.html.twig' as img_macro %}
+            {{ img_macro.picture(image, 325, 220, 'fill', 'smart', 85, 'w-100') }}
+        {% endif %}
+
+        <div class="py-2 px-3">
+            {% if text %}
+                <div class="text pb-2 font-size-18">
+                    {{ text|raw }}
+                </div>
+            {% endif %}
+
+            {% if subtitle %}
+                <h4 class="text-dark">{{ subtitle }}</h4>
+            {% endif %}
+
+            <div class="mt-1 font-size-16">
+                {% if email %}
+                    <a href="mailto:{{ email }}" class="d-flex align-items-center text-decoration-none mb-10px">
+                        <i class="icon icon-email mr-10px"></i>{{ email }}
+                    </a>
+                {% endif %}
+
+                {% if phone %}
+                    <a href="tel:{{ phone|replace({' ': ''}) }}" class="d-flex align-items-center">
+                        <i class="icon icon-phone mr-10px"></i>{{ phone }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}

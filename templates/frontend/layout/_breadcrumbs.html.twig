@@ -1,0 +1,17 @@
+<nav class="breadcrumbs">
+    <ul class="breadcrumbs__list list-unstyled" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="breadcrumbs__item"
+            itemprop="itemListElement"
+            itemscope itemtype="http://schema.org/ListItem">
+            <a href="/" class="breadcrumbs__link" itemprop="item"><span itemprop="name">{{ 'Home'|trans }}</span><meta itemprop="position" content="1" /></a>
+        </li>
+        {% for breadcrumb in breadcrumbs %}
+            {% set active = (loop.index == breadcrumbs|length) %}
+            <li class="breadcrumbs__item{% if loop.last %} is-active{% endif %}"
+                itemprop="itemListElement"
+                itemscope itemtype="http://schema.org/ListItem">
+                <a href="{{ breadcrumb.link }}" class="breadcrumbs__link {% if active %}is-active{% endif %}" itemprop="item"><span itemprop="name">{{ breadcrumb.text }}</span><meta itemprop="position" content="{{ loop.index + 1 }}" /></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>

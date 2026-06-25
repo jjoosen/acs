@@ -1,0 +1,45 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set usps = block.children %}
+    {% set margin_bottom = margin_bottom() %}
+    {% set bg_color = block.field('bg_color') %}
+    {% set center = true %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+ <div id="block-{{ block_id }}" class="{{ bg_color }} {{ margin_bottom }} {% if bg_color %}py-3 py-lg-4{% endif %}">
+     <div class="container">
+         {% if title %}
+             <div class="{% if center %}text-center{% endif %} mb-5">
+                 <h2>{{ title }}</h2>
+             </div>
+         {% endif %}
+
+         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-{% if usps|length is divisible by 3 %}3{% else %}4{% endif %} justify-content-center gap-3">
+             {% set splitterSet = false %}
+             {% if usps %}
+                 {% for usp in usps %}
+                     {% set title = usp.field('title') %}
+                     {% set text = usp.field('text') %}
+                     {% set icon = usp.assets.firstOfType('image') %}
+
+                     <div class="col text-center d-flex flex-column mb-3">
+                         {% if icon %}
+                             <div class="w-100 mb-2">
+                                 {{ img_macro.picture(icon, 200, 80, 'fit', 'smart', 85, 'mw-100') }}
+                             </div>
+                         {% endif %}
+                         <div>
+                             <h3 class="h4">{{ title }}</h3>
+                             {% if text %}
+                                 <div class="text">{{ text|raw }}</div>
+                             {% endif %}
+                         </div>
+                     </div>
+                 {% endfor %}
+             {% endif %}
+         </div>
+     </div>
+ </div>

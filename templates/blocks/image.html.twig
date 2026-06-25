@@ -1,0 +1,15 @@
+{# Sulu block: image — geport van legacy content_blocks/image.html.twig #}
+{% set image = (block.image|default([]))|first %}
+{% if image %}
+    {% if block.compact|default(false) %}
+        <div class="container">
+            <div class="row">
+                <div class="col-12 default-image py-4">
+                    <img class="img-fluid" src="{{ img(image, 0, 0) }}" alt="{{ image.title }}" loading="lazy">
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <img class="w-100" src="{{ img(image, 1400, 600) }}" alt="{{ image.title }}" loading="lazy">
+    {% endif %}
+{% endif %}

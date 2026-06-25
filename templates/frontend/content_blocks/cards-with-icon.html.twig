@@ -1,0 +1,55 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set link = block.field('link') %}
+    {% set link_text = block.field('link_text') %}
+    {% set cards = block.children %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+<section id="block-{{ block_id }}" class="cards-list {{ margin_bottom() }}">
+    <div class="container">
+        {% if title or link %}
+            <div class="row align-items-center mb-1">
+                {% if title %}
+                    <div class="col-sm-{% if link %}9{% else %}12{% endif %}">
+                        <h2 class="mb-0">{{ title }}</h2>
+                    </div>
+                {% endif %}
+
+                {% if link %}
+                    <div class="col-sm-3 align-self-end text-sm-right">
+                        <a href="{{ link }}" class="btn btn--arrow btn--arrow-secondary font-size-16">
+                            {{ link_text ?: "Lees meer"|trans }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="row">
+            {% for card in cards %}
+                {% set title = card.field('title') %}
+                {% set text = card.field('text') %}
+                {% set link = card.field('link') %}
+                {% set icon = card.assets.firstOfType('icon') %}
+
+                <div class="col-sm-6 col-lg-3 mb-1">
+                    <a href="{{ link }}" class="card h-100 d-flex flex-column justify-content-between pt-2 pt-md-3">
+                        <div class="text-center">
+                            {% if icon %}
+                                {{ img_macro.picture(icon, 65, 65, 'fit', 'smart', 85, 'mw-100 card__img') }}
+                            {% endif %}
+                        </div>
+                        <div class="card__body">
+                            <h4 class="card__title text-dark mb-0">{{ title }}</h4>
+                            {% if text %}
+                            <div class="card__text">{{ text|raw }}</div>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,38 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set text = block.field('text') %}
+    {% set notice = block.children|filter(child => child.realtag == 'notice')|first %}
+    {% set image = block.assets.firstOfType('image') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+{% import 'frontend/macros/search.html.twig' as search %}
+
+<header id="block-{{ block_id }}" class="header position-relative">
+    <div class="background-cover background-center position-absolute h-100 w-100 filter-contrast-60 dark-blue-overlay overflow-hidden">
+        {% if image %}
+            {{ img_macro.picture(image, 1440, 800, 'fill', 'smart', 85, 'w-100 h-100 object-fit-cover') }}
+        {% endif %}
+    </div>
+
+    <div class="container header__content text-white">
+        <div class="row align-items-center justify-content-center h-100">
+            <div class="col-md-10 col-lg-8 col-xl-6 text-center mb-3">
+                {% if title %}
+                    <h1 class="header__title">{{ title }}</h1>
+                {% endif %}
+
+                {% if text %}
+                    <div class="text header__text">
+                        {{ text|raw }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-10 col-lg-8 mb-2">
+                {{ search.searchBarHeader() }}
+            </div>
+        </div>
+    </div>
+</header>
+

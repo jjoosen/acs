@@ -1,0 +1,57 @@
+{% if block is defined %}
+    {% set title = block.field('title') %}
+    {% set categories = page.tags.all %}
+
+    {% set catIds = [] %}
+    {% for cat in categories %}
+        {% set catIds = catIds|merge([cat.id]) %}
+    {% endfor %}
+
+    {% set news = get_content('news', 0, 3, catIds, 'published') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% if categories %}
+    <div id="block-{{ block_id }}" class="container {{ margin_bottom() }}">
+        <div class="row">
+            <div class="col-12 mb-2">
+                {% if title %}
+                    <h2>{{ title }}</h2>
+                {% endif %}
+            </div>
+
+            {% for news_item in news %}
+                <div class="col-sm-6 col-xl-4 mb-1">
+                    {% if news_item.field('external_link') %}
+                        {% set url = news_item.field('external_link') %}
+                    {% else %}
+                        {% set url = news_item.url %}
+                    {% endif %}
+
+                    <a href="{{ url }}"{% if news_item.field('external_link') %} target="_blank"{% endif %} class="card">
+                        {% set image = news_item.assets.firstOfType('image') %}
+                        {% if image %}
+                            {{ img_macro.picture(image, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                        {% else %}
+                            {{ img_macro.placeholder(news_item.name, 365, 243, 'fill', 'smart', 85, 'card__img w-100') }}
+                        {% endif %}
+                        <div class="card__body">
+                            <h4 class="card__title">{{ news_item.name }}</h4>
+                            {% if news_item.field('short') %}
+                                <div class="card__text">
+                                    {{ news_item.field('short')|raw }}
+                                </div>
+                            {% endif %}
+                            <div class="btn btn--arrow btn--arrow-primary">
+                                {{ "Lees meer"|trans }}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+

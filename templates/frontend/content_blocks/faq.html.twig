@@ -1,0 +1,28 @@
+<div class="container {{ margin_bottom() }}">
+    {% for item in listview_items %}
+        <div>
+            <h4>{{ item.name }}</h4>
+            <div class="text">{{ item.field('answer')|raw }}</div>
+        </div>
+    {% endfor %}
+</div>
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+    {% for item in listview_items %}
+    {
+        "@type": "Question",
+        "name": "{{ item.name }}",
+        "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{{ item.field('answer')|raw }}"
+        }
+    }
+    {% if not loop.last %},{% endif %}
+    {% endfor %}
+    ]
+}
+</script>

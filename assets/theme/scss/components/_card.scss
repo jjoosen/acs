@@ -1,0 +1,52 @@
+.cards-list {
+  position: relative;
+  z-index: 5;
+}
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+  border-radius: $border-radius;
+  display: block;
+  transition: $transition;
+  font-size: 16px;
+  background: white;
+  overflow: hidden;
+  height: 100%;
+
+  &:hover, &:focus {
+    color: inherit;
+    box-shadow: 0 4px 12px 0 rgba($color-2, 0.1);
+  }
+
+  &:not(.card--no-hover-effect) {
+    &:hover, &:focus {
+      text-decoration: none;
+      transform: translateY(-5px);
+
+      .btn--arrow:after {
+        transform: translateX(5px);
+      }
+    }
+  }
+
+  a:not(.btn) {
+    color: $primary;
+
+    &:hover, &:focus {
+      text-decoration: none;
+      color: $secondary;
+    }
+  }
+
+  &__body, &__footer {
+    padding: 25px;
+  }
+
+  &__footer{
+    padding-top: 0;
+  }
+
+  &__text {
+    color: $color-text;
+  }
+}

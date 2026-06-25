@@ -1,0 +1,57 @@
+// Fonts
+// @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@400;600;700;800&display=swap');
+
+// Variables
+@import 'variables';
+
+// Bootstrap styles
+@import '~bootstrap/scss/bootstrap-grid';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/utilities';
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/forms';
+@import '~bootstrap/scss/custom-forms';
+@import '~bootstrap/scss/transitions';
+@import '~bootstrap/scss/alert';
+@import '~bootstrap/scss/badge';
+
+// General styles
+@import 'helpers';
+
+// Plugins:
+@import 'plugins/iconfont';
+@import 'plugins/hamburgers/hamburgers';
+@import url('~@fancyapps/fancybox/dist/jquery.fancybox.css');
+@import url('~@splidejs/splide/dist/css/splide-core.min.css');
+
+// Layout
+@import 'layout/general';
+@import 'layout/text';
+@import 'layout/header';
+@import 'layout/footer';
+@import 'layout/forms';
+
+// Components
+@import "components/badge";
+@import "components/bg-elements";
+@import "components/buttons";
+@import "components/card";
+@import "components/breadcrumbs";
+@import "components/color-block";
+@import "components/cookie-notice";
+@import "components/google-maps";
+@import "components/header";
+@import "components/history";
+@import "components/images-link";
+@import "components/job";
+@import "components/location";
+@import "components/pagination";
+@import "components/picture-grid";
+@import "components/quote";
+@import "components/scroll-animations";
+@import "components/search-box";
+@import "components/side-menu";
+@import "components/summary";
+@import "components/toggle-list";
+

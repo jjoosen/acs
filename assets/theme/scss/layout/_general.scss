@@ -1,0 +1,53 @@
+/**
+General layout
+ */
+
+body {
+  background-color: #fff;
+  //padding-top: 105px; // Fixed header offset
+
+  &.scroll-down,
+  &.scroll-up {
+    .main-nav-trans__container {
+      background-color: $light;
+      color: $color-1;
+      transition: 0.6s ease-in;
+    }
+
+    .main-nav-trans__link {
+      color: $color-1;
+
+      &.btn {
+        color: $light;
+      }
+    }
+
+    .top-nav-trans {
+      background-color: $color-light-blue;
+      color: $color-1;
+      transition: 0.6s ease-in;
+    }
+
+    .top-nav-trans__link {
+      color: $color-1;
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a,
+button {
+  cursor: pointer;
+  transition: color $transition, background-color $transition, border $transition;
+}
+
+picture {
+  display: block;
+
+  img {
+    width: 100%;
+  }
+}

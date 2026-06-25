@@ -1,0 +1,214 @@
+{% set experience = block.field('experience') %}
+{% set employment_type = page.field('employment_type') %}
+{% set employment_type_text = block.field('kind') %}
+{% set image = block.assets.firstOfType('image') %}
+{% set text_children = block.children|filter(child => child.realtag == 'text') %}
+{% set tags = page.tags.all %}
+{% set jobs = get_content('job', 0, 20, {}, 'sortIndex') %}
+{% set locations = get_content('location', 0, 100) %}
+
+{# Dirty way of getting job locations #}
+{% set location_arr = [] %}
+{% for tag in tags %}
+    {% for location in locations %}
+        {% if location.field('postal_city') ends with tag.name %}
+            {% set location_arr = location_arr|merge([location]) %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+{% set inactive = page.fields.inactive|default %}
+
+<header class="header-small position-relative {% if inactive %} mb-4{% else %}{{ margin_bottom() }}{% endif %}">
+    <div class="background-cover background-center position-absolute h-100 w-100 filter-contrast-60 {% if not image %}bg-secondary-light{% endif %}"
+         {% if image %}style="background-image: linear-gradient(0deg, rgba(81, 136, 250, 0.55), rgba(81, 136, 250, 0.55)), url({{ img(image.getFilename(), 1440, 640) }})"{% endif %}></div>
+    <div class="container header-small__content {% if image %}text-white{% else %}text-dark{% endif %}">
+        <div class="row align-items-center h-100">
+            <div class="col-12">
+                {% include '/frontend/layout/_breadcrumbs.html.twig' %}
+                <h1 class="h2 mb-0 header__title {% if image %}text-white{% else %}text-primary{% endif %}">{{ page.name }}</h1>
+                <div class="d-sm-inline-block mr-3 font-size-16 font-weight-bold align-middle">
+                    <i class="icon icon-pin d-inline-block mb-5px mr-5px font-size-25 align-middle"></i>
+                    {% for tag in tags %}
+                        {{ tag.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+                {% if experience %}
+                    <div class="d-sm-inline-block mr-3 font-size-16 font-weight-bold align-middle">
+                        <i class="icon icon-calendar d-inline-block mb-5px mr-5px font-size-25 align-middle"></i>
+                        {{ experience }}
+                    </div>
+                {% endif %}
+                {% if employment_type_text %}
+                    <div class="d-sm-inline-block mr-3 font-size-16 font-weight-bold align-middle">
+                        <i class="icon icon-clock d-inline-block mb-5px mr-5px font-size-25 align-middle"></i>
+                        {{ employment_type_text }}
+                    </div>
+                {% endif %}
+
+                {% if inactive %}
+                    <div>
+                        <span class="badge badge-danger">
+                            {{ 'job_inactive_badge'|trans }}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+
+{% if inactive %}
+    <div class="container mb-4">
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-lg-9">
+                <h2 class="text-center mb-0">
+                    {{ 'job_inactive_title'|trans }}
+                </h2>
+
+                <p class="text-center mb-3">
+                    {{ 'job_inactive_text'|trans }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for job in jobs %}
+                {% if job.fields.inactive|default == false %}
+                    <div class="col-sm-6 col-xl-4 mb-32px d-flex">
+                        <a href="{{ job.url }}" class="card w-100">
+                            <div class="card__body">
+                                <div class="font-size-16 mb-1">
+                                    <span class="align-middle font-weight-bold">
+                                        {% for tag in job.tags.all %}
+                                            {{ tag.name }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    <i class="icon icon-pin font-size-20 text-secondary position-relative" style="top: -2px"></i>
+                                </div>
+
+                                <h4 class="card__title mb-0">{{ job.name }}</h4>
+                                {% if job.fields.description|default %}
+                                    <div class="card__text mt-1">
+                                        {{ job.fields.description|raw }}
+                                    </div>
+                                {% endif %}
+
+
+                                {#
+                                <div class="font-size-14 opacity-70 mb-1">
+                                    {{ "Gepost op"|trans }}
+                                    <time datetime="{{ news_item.publishDate|date('Y-m-d') }}">{{ news_item.publishDate|localizeddate('none', 'none', app.request.locale, null, 'd MMMM Y') }}</time>
+                                </div>
+
+                                {% if news_item.field('short') %}
+                                    <div class="card__text">
+                                        {{ news_item.field('short')|raw }}
+                                    </div>
+                                {% endif %}
+                                <div class="btn btn--arrow btn--arrow-primary">
+                                    {{ "Lees meer"|trans }}
+                                </div>
+                                #}
+                            </div>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-7 col-xl-8 mb-3 mb-lg-0">
+            <div class="mr-lg-3">
+                {% for text_block in text_children %}
+                    {% set title = text_block.field('title') %}
+                    {% set title_size = text_block.field('title_size') %}
+                    {% set text = text_block.field('text') %}
+
+                    {% if title %}
+                        <h{{ title_size|default(2) }}>{{ title }}</h{{ title_size|default(2) }}>
+                    {% endif %}
+
+                    {% if text %}
+                        <div class="text mb-3 mb-lg-4">
+                            {{ text|raw }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-xl-4 mb-2 mb-lg-4">
+            <div class="ml-lg-3">
+                {{ fixed_block('jobs_sidebar_text') }}
+
+                <h3 class="mt-4">{{ "Andere vacatures" }}</h3>
+                <ul class="side-menu list-unstyled">
+                    {% for job in jobs %}
+                        {% if job.fields.inactive|default == false %}
+                            {% set isCurrent = app.request.uri ends with job.url %}
+                            <li class="side-menu__item {% if isCurrent %}is-active{% endif %}">
+                                {% if isCurrent %}
+                                    <div class="side-menu__link text-secondary">{{ job.name }}</div>
+                                {% else %}
+                                    <a class="side-menu__link" href="{{ job.url }}">{{ job.name }}</a>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Structured Data - UPDATE ACCORDINGLY! #}
+{# All these properties are required - (if these are not present, you may as well remove the structured data) #}
+{# Always check with https://search.google.com/structured-data/testing-tool/u/0/ or a browser plugin #}
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "JobPosting",
+    "title": "{{ block.field('title') ?: page.name }}",
+    "datePosted": "{{ page.publishDate|date('Y-m-d\\TH:i:sP') }}",
+    "description": "{{ page.field('description')|raw }}",
+    "hiringOrganization": {
+      "@type": "Organization",
+      "name": "{{ setting('company_name') }}",
+      "sameAs": "{{ app.request.getSchemeAndHttpHost() }}",
+      "logo": "{{ app.request.getSchemeAndHttpHost() }}/build/images/{{ setting('logo_name') }}.png"
+    },
+    {% if employment_type %}
+    "employmentType" : "{{ employment_type }}",
+    {% endif %}
+    {% if location_arr %}
+    "jobLocation": [
+        {% for location in location_arr %}
+        {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "{{ location.field('postal_city')|split(' ')|last|default }}",
+            "postalCode": "{{ location.field('postal_city')|split(' ')|first|default }}",
+            "streetAddress": "{{ location.field('street_number') }}",
+            "addressCountry": "BE"
+          }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+    {% else %}
+    "jobLocation": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "{{ setting('city') }}",
+        "postalCode": "{{ setting('postal_code') }}",
+        "streetAddress": "{{ setting('street_number') }}"
+      }
+    }
+    {% endif %}
+}
+</script>

@@ -1,0 +1,29 @@
+{% set children = block is defined ? block.children : null %}
+{% if children %}
+    <div class="btn-group mt-2">
+        {% for child in children if child.realTag == 'button' %}
+            {% set link = child.field('link') %}
+            {% set type = child.field('type') %}
+            {% set title = child.field('title') %}
+            {% set video_link = child.field('video_link') %}
+            {% set video = child.assets.firstOfType('video') %}
+
+            {% if video_link %}
+                {% set link = video_link %}
+            {% elseif video %}
+                {% set link = view_file_link(video.id) %}
+            {% endif %}
+
+            <a href="{{ link }}" class="mb-1 mr-1 btn {{ type ? : 'btn--primary' }}" {% if video or video_link %}data-fancybox{% endif %}>
+                {% if video or video_link %}
+                    <i class="icon icon-play mr-5px"></i>
+                {% elseif 'mac' in title|lower %}
+                    <i class="icon icon-apple mr-5px"></i>
+                {% elseif 'windows' in title|lower %}
+                    <i class="icon icon-windows mr-5px"></i>
+                {% endif %}
+                <span class="align-middle">{{ title }}</span>
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

@@ -1,0 +1,49 @@
+$icons: (
+    'apple'
+    'angle-down'
+    'arrow-down'
+    'arrow-left'
+    'arrow-right'
+    'calendar'
+    'clock'
+    'download'
+    'email'
+    'facebook'
+    'innomedio'
+    'instagram'
+    'instagram-alt'
+    'job'
+    'linkedin'
+    'minus'
+    'phone'
+    'pin'
+    'play'
+    'plus'
+    'profile'
+    'search'
+    'warning'
+    'windows'
+    'youtube'
+);
+
+.icon {
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  vertical-align: middle;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  &:before {
+    vertical-align: middle;
+  }
+}
+
+@each $icon in $icons {
+  .icon-#{$icon}:before {
+    font-icon: url('../images/icons/#{$icon}.svg');
+  }
+}

@@ -1,0 +1,69 @@
+{% set locations = get_content('location', 0, 999, {}, 'sortIndex') %}
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "url": "{{ app.request.getSchemeAndHttpHost() }}",
+    {# UPDATE THIS! #}
+    "logo": "{{ app.request.getSchemeAndHttpHost() }}/build/images/{{ setting('logo_name') }}.png",
+    {% if setting('company_name') %}
+    "name": "{{ setting('company_name') }}",
+    {% endif %}
+    {% if setting('email') %}
+    "email": "{{ setting('email') }}",
+    {% endif %}
+    {% if setting('phone') %}
+    "telephone": "{{ setting('phone') }}",
+    {% endif %}
+    {% if setting('vat') %}
+    "vatID": "{{ setting('vat') }}",
+    {% endif %}
+    {% if setting('city') %}
+    "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "{{ setting('city') }}",
+        "postalCode": "{{ setting('postal_code') }}",
+        "streetAddress": "{{ setting('street_number') }}"
+    },
+    {% endif %}
+
+    "location": [
+    {% for location in locations %}
+        {% set name = location.name %}
+        {% set street_number = location.field('street_number') %}
+        {% set postal_city = location.field('postal_city') %}
+        {% set postal_code = postal_city|split(' ')|first %}
+        {% set city = postal_city|split(' ')|last %}
+        {% set email = location.field('email') %}
+        {% set phone = location.field('phone') %}
+        {% set image = location.assets.firstOfType('image') %}
+        {
+            "@type": "PostalAddress",
+            {% if name %}
+            "name" : "{{ name }}",
+            {% endif %}
+            {% if image %}
+            "image": "{{ image.getFilename() }}",
+            {% endif %}
+            {% if city %}
+            "addressLocality": "{{ city }}",
+            {% endif %}
+            {% if postal_code %}
+            "postalCode": "{{ postal_code }}",
+            {% endif %}
+            {% if street_number %}
+            "streetAddress": "{{ street_number }}",
+            {% endif %}
+            {% if phone %}
+            "telephone" : "{{ phone }}",
+            {% endif %}
+            {% if email %}
+            "email": "{{ email }}"
+            {% endif %}
+        }
+        {% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>

@@ -1,0 +1,22 @@
+{% if block is defined %}
+    {% set iframe = block.field('iframe') %}
+    {% set block_id = block.id %}
+{% endif %}
+
+{% if iframe %}
+    <iframe id="block-{{ block_id }}" src="{{ iframe }}"
+            frameborder="0"
+            allowfullscreen=""
+            aria-hidden="false"
+            tabindex="0"
+            class="google-maps">
+    </iframe>
+{% elseif setting('gmaps_key') %}
+    <div id="block-{{ block_id }}"></div>
+    <div id="map" class="google-maps" data-gmaps-key="{{ setting('gmaps_key') }}"></div>
+
+    <script>
+        {% include 'frontend/content_blocks/partials/_locations.js.twig' %}
+    </script>
+{% endif %}
+

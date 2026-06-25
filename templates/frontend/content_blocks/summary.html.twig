@@ -1,0 +1,27 @@
+{% if block is defined %}
+	{% set title = block.field('title') %}
+	{% set items = block.children %}
+	{% set margin_bottom = block.field('margin_bottom') ?: margin_bottom() %}
+	{% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="container {{ margin_bottom }}">
+	<h2 class="text-center mb-4" >{{ title }}</h2>
+	<div class="js-scroll-reveal-children">
+		{%  for item in items %}
+			<div class="row px-3 px-lg-4 px-xl-5 justify-content-center">
+				{% set text = item.field('text') %}
+				<div class="col-lg-1 mb-3 d-flex justify-content-center d-lg-block">
+					<div class="summary__dot d-flex align-items-center justify-content-center">
+						{{ loop.index }}
+					</div>
+				</div>
+				{% if text %}
+					<div class="col-lg-11 mb-3 px-2">
+						<div class="text">{{ text|raw }}</div>
+					</div>
+				{% endif %}
+			</div>
+		{% endfor %}
+	</div>
+</div>

@@ -1,0 +1,22 @@
+{# Sulu block: banner — geport van legacy content_blocks/banner.html.twig #}
+{% set image = (block.image|default([]))|first %}
+{% set height = block.height|default('') ?: 'py-3 py-lg-6' %}
+{% set text_size = block.text_size|default('') %}
+{% set nomb = block.no_bottom_margin|default(false) %}
+
+<div class="banner position-relative {% if nomb %}mb-0{% else %}{{ margin_bottom() }}{% endif %}">
+    <div class="background-cover background-center background-fixed position-absolute h-100 w-100 filter-contrast-60 {% if not image %}bg-secondary-light{% endif %}"
+         {% if image %}style="background-image: linear-gradient(0deg, rgba(81,136,250,.55), rgba(81,136,250,.55)), url({{ img(image, 1440, 640) }})"{% endif %}></div>
+    <div class="container">
+        <div class="row justify-content-center text-center {% if image %}text-white{% endif %} {{ height }}">
+            <div class="{% if text_size == 'big-text' %}col-lg-9{% else %}col-md-8 col-lg-6{% endif %}">
+                {% if block.title|default %}
+                    <h2 class="banner__title {% if image %}text-white{% endif %}">{{ block.title }}</h2>
+                {% endif %}
+                {% if block.text|default %}
+                    <div class="text {{ text_size }}">{{ block.text|raw }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

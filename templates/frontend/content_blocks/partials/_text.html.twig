@@ -1,0 +1,7 @@
+{% set text = block.field('text') %}
+
+{% if text %}
+    <div class="text">
+        {{ text|raw }}
+    </div>
+{% endif %}

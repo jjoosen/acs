@@ -1,0 +1,10 @@
+.job {
+  &:hover, &:focus {
+    background: $color-light-blue;
+    color: inherit;
+  }
+}
+
+#jobs-list .job:not(:last-child) {
+  border-bottom: 1px solid $border-color;
+}

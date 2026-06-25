@@ -1,0 +1,12 @@
+{% extends 'frontend/base.html.twig' %}
+
+{% block content %}
+    {% if page.field('external_link')|default %}
+        {{ redirect(page.field('external_link')) }}
+    {% endif %}
+
+    {# @var block \Innomedio\Symfony\Bundle\BaseBundle\Service\Content\ObjectBuilder\Object\ContentBlock #}
+    {% for block in blocks %}
+        {% include block.template %}
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% if block is defined %}
+	{% set text_small = block.field('text_small') %}
+	{% set text = block.field('text') %}
+	{% set center = block.field('center'|default(false)) %}
+	{% set block_id = block.id %}
+{% endif %}
+
+<div id="block-{{ block_id }}" class="container mb-3">
+	<div class="row align-items-center {% if center%} justify-content-center {% else %} justify-content-start ml-3{% endif %}">
+		<div class="col-sm-7 col-md-6 col-lg-5 col-xl-4">
+			<figure class="quote">
+				<blockquote class="quote__text mb-2">
+					{% if text %}
+						{{ text|raw }}
+					{% endif %}
+				</blockquote>
+				<figcaption class="quote__author">
+					{% if text_small %}
+						{{ text_small|raw  }}
+					{% endif %}
+				</figcaption>
+			</figure>
+		</div>
+	</div>
+</div>
+

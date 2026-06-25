@@ -1,0 +1,16 @@
+.location__image--round {
+  width: 100px;
+  height: 100px;
+}
+
+.header-location__background  {
+  &:after {
+    content: "";
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background: rgba(81, 136, 250, 0.55);
+    top: 0;
+    left: 0;
+  }
+}

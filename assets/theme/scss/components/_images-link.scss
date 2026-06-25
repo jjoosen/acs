@@ -1,0 +1,15 @@
+.images-link {
+
+  &__image{
+    &:hover, &:focus {
+      opacity: 0.8;
+    }
+  }
+
+    &__title {
+
+      @include media-breakpoint-up(sm) {
+        white-space: nowrap;
+      }
+    }
+}

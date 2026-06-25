@@ -1,0 +1,137 @@
+{% set footer_nav_1 = navigation('footer1', true, true) %}
+{% set footer_nav_2 = navigation('footer2', true, true) %}
+{% set footer_nav_3 = navigation('footer3', true, true) %}
+{% set copyright_nav = navigation('copyright', true, true) %}
+
+<footer class="page-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                <img class="page-footer__logo img-fluid mb-3"
+                     src="{{ asset('/build/images/logo-white-alt.png') }}"
+                     srcset="{{ asset('/build/images/logo-white-alt@2x.png') }} 2x"
+                     alt="{{ setting('site_name') }}"
+                >
+                <div class="page-footer__text mb-3">
+                    {{ "Al meer dan 45 jaar helpt Ac|s ondernemers uit diverse sectoren om hun zaak uit te bouwen."|trans }}
+                </div>
+            </div>
+            <div class="col-12 col-md-10 col-lg-7 offset-lg-1 d-flex justify-content-between flex-wrap">
+                {% if footer_nav_1  %}
+                    <div class="page-footer__nav mb-2">
+                        <h4 class="page-footer__title">{{ "Jij bent" }}</h4>
+
+                        <nav class="page-footer__nav">
+                            <ul class="page-footer__nav-list list-unstyled">
+                                {% for item in footer_nav_1 %}
+                                <li class="page-footer__nav-item">
+                                    <a href="{{ item.url }}" class="page-footer__nav-link">{{ item.name }}</a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+
+                {% if footer_nav_2  %}
+                    <div class="page-footer__nav mb-2">
+                        <h4 class="page-footer__title">{{ "Onze Expertise" }}</h4>
+
+                        <nav class="page-footer__nav">
+                            <ul class="page-footer__nav-list list-unstyled">
+                                {% for item in footer_nav_2 %}
+                                    <li class="page-footer__nav-item">
+                                        <a href="{{ item.url }}" class="page-footer__nav-link">{{ item.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+
+                {% if footer_nav_3  %}
+                    <div class="page-footer__nav mb-2">
+                        <h4 class="page-footer__title">{{ "Bedrijf" }}</h4>
+
+                        <nav class="page-footer__nav">
+                            <ul class="page-footer__nav-list list-unstyled">
+                                {% for item in footer_nav_3 %}
+                                    <li class="page-footer__nav-item">
+                                        <a href="{{ item.url }}" class="page-footer__nav-link">{{ item.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="copyright">
+    <div class="element-1"></div>
+
+    <div class="container">
+        <div class="row justify-content-between border-top py-3 align-items-center">
+            <div class="col-12 col-lg-6 text-center text-lg-left">
+                <span class="pl-10px">&copy; Copyright {{ 'now'|date('Y') }} {{ setting('site_name') }}</span>
+                <span class="px-10px d-none d-sm-inline">|</span>
+                <span class="d-block d-sm-inline-block">
+                    <a href="https://www.innomedio.be" class="text-underline" target="_blank" rel="noopener"><i class="icon icon-innomedio"></i>
+                    </a>
+                </span>
+            </div>
+            <div class="col-12 col-lg-6 text-center text-lg-right">
+                <ul class="list-unstyled">
+                    {% for item in copyright_nav %}
+                        <li class="d-block d-sm-inline-block copyright__list-item align-middle">
+                            <a class="p-5px p-md-10px d-block" href="{{ item.url }}">{{ item.name }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if setting('facebook') %}
+                        <li class="d-inline-block align-middle">
+                            <a class="copyright__icon-link px-5px align-middle d-inline-block" title="Facebook" href="{{ setting('facebook') }}">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if setting('instagram') %}
+                        <li class="d-inline-block align-middle">
+                            <a class="copyright__icon-link px-5px align-middle d-inline-block" title="Instagram" href="{{ setting('instagram') }}">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if setting('youtube') %}
+                        <li class="d-inline-block align-middle">
+                            <a class="copyright__icon-link px-5px align-middle d-inline-block" title="YouTube" href="{{ setting('youtube') }}">
+                                <i class="icon icon-youtube"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if setting('linkedin') %}
+                        <li class="d-inline-block align-middle">
+                            <a class="copyright__icon-link px-5px align-middle d-inline-block" title="LinkedId" href="{{ setting('linkedin') }}">
+                                <i class="icon icon-linkedin"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "url": "{{ app.request.getSchemeAndHttpHost() }}",
+    {% if setting('site_name') %}
+    "name": "{{ setting('site_name') }}",
+    {% endif %}
+    "logo": "{{ app.request.getSchemeAndHttpHost() }}/build/images/{{ setting('logo_name') }}@2x.png"
+}
+</script>

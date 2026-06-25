@@ -1,0 +1,17 @@
+{% set title = child.field('title') %}
+{% set link = child.field('link') %}
+{% set linkTarget = child.field('link-target') %}
+{% set image = child.assets.firstOfType('image') %}
+
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% if image %}
+	<div class="col-md-4 mb-3">
+		{% if title %}
+			<h3 class="h4 d-flex align-items-center images-link__title">{{ title }}</h3>
+		{% endif %}
+		<a href="{{ link }}" target="{{ linkTarget }}" class="images-link__image">
+			{{ img_macro.picture(image, 600, 600, 'fill', 'smart', 85, 'w-100') }}
+		</a>
+	</div>
+{% endif %}

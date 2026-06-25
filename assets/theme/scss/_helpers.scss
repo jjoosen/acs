@@ -1,0 +1,212 @@
+/**
+Helper classes
+ */
+
+// background
+.background-primary {
+  background-color: $color-1;
+}
+
+.background-cover {
+  background-size: cover;
+}
+
+.background-center {
+  background-position: center center;
+}
+
+.background-fixed {
+  background-attachment: fixed;
+}
+
+.background-contain {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.bg-theme-color {
+  background: $color-4;
+  color: white;
+
+  a {
+    color: white;
+
+    &:hover {
+      color: white;
+    }
+  }
+}
+
+.bg-secondary-light {
+  background: $color-light-blue;
+}
+
+.bg-tertiary {
+  background: $color-3;
+}
+
+// text
+.list-unstyled {
+  margin-bottom: 0;
+}
+
+.font-size-10 {
+  font-size: 10px;
+}
+
+.font-size-12 {
+  font-size: 12px;
+}
+
+.font-size-14 {
+  font-size: 14px;
+}
+
+.font-size-16 {
+  font-size: 16px !important;
+}
+
+.font-size-18 {
+  font-size: 18px;
+}
+
+.font-size-20 {
+  font-size: 20px;
+}
+
+.font-size-25 {
+  font-size: 25px;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.text-tertiary {
+  color: $color-3;
+}
+
+// images
+.img-fluid {
+  max-width: 100%;
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.filter-contrast-60 {
+  filter: contrast(0.6);
+}
+
+// spacings
+.mb-md--145px {
+  @include media-breakpoint-up(md) {
+    margin-bottom: -145px;
+  }
+}
+
+.position-md-absolute {
+  @include media-breakpoint-up(md) {
+    position: absolute;
+  }
+}
+
+.mt--45px {
+  margin-top: -45px;
+}
+
+.mb--100px {
+  margin-bottom: -100px;
+}
+
+.mt--100px {
+  margin-top: -100px;
+}
+
+// other
+
+.border-radius {
+  border-radius: $border-radius;
+}
+
+.box-shadow {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+}
+
+.opacity-70 {
+  opacity: 0.7;
+}
+
+.dark-blue-overlay:after {
+  content: "";
+  background: rgba(81, 136, 250, 0.55);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.outline-0 {
+  outline: 0;
+
+  &:hover, &:focus {
+    outline: 0;
+  }
+}
+
+.background-none {
+  background: none;
+}
+
+.white-links {
+  a {
+    text-decoration: underline;
+    color: $color-light-blue;
+
+  &:hover, &:focus {
+    color: $color-light;
+  };
+  }
+}
+
+.count {
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  text-align: center;
+  display: inline-block;
+  border-radius: 50%;
+  background-color: $secondary;
+  color: #fff;
+  font-weight: normal;
+  font-size: 0.5em;
+}
+
+.img-absolute {
+  @include media-breakpoint-up(md) {
+    position: absolute;
+    bottom: -100px;
+    right: 100px;
+  }
+}
+
+.default-image {
+  text-align: center;
+
+  img {
+    max-width: 100%;
+  }
+}

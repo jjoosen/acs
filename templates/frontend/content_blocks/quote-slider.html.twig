@@ -1,0 +1,63 @@
+{% set quotes = block.children %}
+{% set title = block.getField('title') %}
+{% set text = block.getField('text') %}
+
+{% if quotes %}
+    <div class="bg-secondary-light py-4 {{ margin_bottom() }}">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    {% if title or text %}
+                        <div class="text-center mb-3">
+                            {% if title %}
+                                <h2>{{ title }}</h2>
+                            {% endif %}
+                            {% if text %}
+                                <div class="text">{{ text|raw }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="bg-white box-shadow p-3 rounded">
+                        <div class="splide js-quote-slider">
+                            <div class="splide__track">
+                                <ul class="splide__list">
+                                    {% for item in quotes %}
+                                    <li class="splide__slide">
+                                        {% set quote = item.getField('quote') %}
+                                        {% set author = item.getField('author') %}
+                                        {% set function = item.getField('function') %}
+
+                                        <blockquote class="quote-slide mb-0">
+                                            <div class="quote-slide__quote">&ldquo;{{ quote|nl2br }}&rdquo;</div>
+                                            <hr>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {% if author %}
+                                                        <strong>{{ author }}</strong>
+                                                    {% endif %}
+                                                    {% if function %}
+                                                        <div>{{ function }}</div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <button class="js-quote-slider-btn btn-reset mx-5px" data-go="<">
+                                                        <i class="icon icon-arrow-left font-size-12"></i>
+                                                    </button>
+                                                    <button class="js-quote-slider-btn btn-reset mx-5px" data-go=">">
+                                                        <i class="icon icon-arrow-right font-size-12"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </blockquote>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

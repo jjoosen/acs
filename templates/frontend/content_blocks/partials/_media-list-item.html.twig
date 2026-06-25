@@ -1,0 +1,17 @@
+{% import 'frontend/macros/images.html.twig' as img_macro %}
+
+{% for child in children %}
+
+	{% set title = child.field('title') %}
+	{% set link = child.field('link') %}
+	{% set linkTarget = child.field('link-target') %}
+	{% set image = child.assets.firstOfType('image') %}
+
+	<div class="col-md-6 col-lg-4 col-xl-3 mb-3 js-media-item">
+		<a href="{{ link }}" target="{{ linkTarget }}" >
+			{% if image %}
+				{{ img_macro.picture(image, 320, 320, 'fill', 'smart', 85, 'w-100') }}
+			{% endif %}
+		</a>
+	</div>
+{% endfor %}
