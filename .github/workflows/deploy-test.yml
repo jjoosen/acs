@@ -104,6 +104,9 @@ jobs:
               echo "--- eerste 800 tekens response ---"; head -c 800 /tmp/body; echo; echo "---"
             fi
           done
+          echo "===== CHECK /profielen/ondernemer ====="
+          OB=$(curl -k -s -L --max-time 30 "$BASE/profielen/ondernemer")
+          echo "bytes=$(printf '%s' "$OB" | wc -c)  marathon-hits=$(printf '%s' "$OB" | grep -c 'marathon')"
           echo "===== VOLLEDIGE HOMEPAGE-HTML ====="
           curl -k -s -L --max-time 30 "$BASE/" | head -c 4000
           echo; echo "===== EINDE HOMEPAGE ====="
