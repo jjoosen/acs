@@ -90,6 +90,12 @@ jobs:
         run: |
           BASE="${{ secrets.SITE_URL }}"
           if [ -z "$BASE" ]; then BASE="https://goldeneye.digital"; fi
+          echo "=== BEELD-FETCH TEST (runner -> acs.be, browser-UA) ==="
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
+          for u in "https://www.acs.be/upload/files/page-block/13/header-img.jpg" "https://www.acsac.eu/upload/files/page-block/13/header-img.jpg"; do
+            code=$(curl -s -o /tmp/img -A "$UA" -w "%{http_code} %{content_type}" --max-time 25 "$u" || echo "000")
+            echo "runner -> $u : $code  (bytes=$(wc -c </tmp/img 2>/dev/null))"
+          done
           echo "Healthcheck op $BASE"
           for path in "/" "/admin/" "/build/css/app.css" "/onze-expertise"; do
             code=$(curl -k -s -o /tmp/body -w "%{http_code}" -L --max-time 30 "$BASE$path" || echo "000")
