@@ -106,9 +106,20 @@ jobs:
           fi
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "PHP_BIN='${{ secrets.PHP_BIN }}' DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" <<'EOF'
-          cd "$DEPLOY_PATH" || exit 0
           PHP="${PHP_BIN:-php}"
           echo "PHP (CLI): $($PHP -v 2>&1 | head -1)"
-          echo "=== laatste prod-log ==="
-          tail -n 25 var/log/prod-*.log 2>/dev/null || tail -n 25 var/log/prod.log 2>/dev/null || echo "(geen prod-log)"
+          echo "HOME=$HOME"
+          echo "DEPLOY_PATH=$DEPLOY_PATH"
+          echo "=== onze app aanwezig in DEPLOY_PATH? ==="
+          ls -la "$DEPLOY_PATH/public/index.php" "$DEPLOY_PATH/public/build/css/app.css" "$DEPLOY_PATH/.htaccess" 2>&1
+          echo "=== HOME structuur ==="
+          ls -la "$HOME" 2>/dev/null | head -40
+          echo "=== mogelijke docroots ==="
+          for d in "$HOME/www" "$HOME/public_html" "$HOME/httpdocs" "$HOME/web" "$HOME/sites" "$HOME/domains" "$DEPLOY_PATH/.." "$DEPLOY_PATH/httpdocs" "$DEPLOY_PATH/public_html" "$DEPLOY_PATH/www"; do
+            [ -e "$d" ] && { echo "--- $d ---"; ls -la "$d" 2>/dev/null | head -20; }
+          done
+          echo "=== alle index.php / index.html (max diepte 5) ==="
+          find "$HOME" -maxdepth 5 \( -name 'index.php' -o -name 'index.html' \) 2>/dev/null | head -60
+          echo "=== zoek 'goldeneye' in paden ==="
+          find / -maxdepth 6 -type d -iname '*goldeneye*' 2>/dev/null | head -20
           EOF
