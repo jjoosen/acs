@@ -44,6 +44,13 @@ final class MigrateCommand extends Command
         'usps' => 'usps',
         'image' => 'image',
         'quote' => 'quote',
+        'header' => 'header',
+        'header_small' => 'header_small',
+        'text_card' => 'text_card',
+        'video' => 'video',
+        'google_maps' => 'google_maps',
+        'code' => 'code',
+        'text_menu' => 'text_menu',
         // ... resterende bloktypes, zie blok-inventaris in de blueprint
     ];
 

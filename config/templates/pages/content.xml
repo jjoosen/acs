@@ -123,6 +123,87 @@
                     <property name="center" type="checkbox"><meta><title lang="nl">Gecentreerd</title></meta></property>
                 </properties>
             </type>
+
+            <!-- ====== header (hero) ====== -->
+            <type name="header">
+                <meta><title lang="nl">Header (hero)</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="youtube_id" type="text_line"><meta><title lang="nl">YouTube ID</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Achtergrondafbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== header_small ====== -->
+            <type name="header_small">
+                <meta><title lang="nl">Header (klein)</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Achtergrondafbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== text_card ====== -->
+            <type name="text_card">
+                <meta><title lang="nl">Tekstkaart</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Afbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== video ====== -->
+            <type name="video">
+                <meta><title lang="nl">Video</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <property name="youtube_id" type="text_line"><meta><title lang="nl">YouTube ID</title></meta></property>
+                    <property name="no_breadcrumbs" type="checkbox"><meta><title lang="nl">Geen broodkruimels</title></meta></property>
+                    <property name="image" type="media_selection">
+                        <meta><title lang="nl">Poster/afbeelding</title></meta>
+                        <params><param name="types" value="image"/></params>
+                    </property>
+                </properties>
+            </type>
+
+            <!-- ====== google_maps ====== -->
+            <type name="google_maps">
+                <meta><title lang="nl">Google Maps</title></meta>
+                <properties>
+                    <property name="iframe" type="text_area"><meta><title lang="nl">Iframe-URL</title></meta></property>
+                </properties>
+            </type>
+
+            <!-- ====== code ====== -->
+            <type name="code">
+                <meta><title lang="nl">Code / HTML</title></meta>
+                <properties>
+                    <property name="code" type="text_area"><meta><title lang="nl">Code</title></meta></property>
+                </properties>
+            </type>
+
+            <!-- ====== text_menu ====== -->
+            <type name="text_menu">
+                <meta><title lang="nl">Tekst met menu</title></meta>
+                <properties>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                </properties>
+            </type>
             </types>
         </block>
     </properties>

@@ -1,0 +1,24 @@
+{# Sulu block: header (hero) — geport van legacy content_blocks/header.html.twig #}
+{% set image = (block.image|default([]))|first %}
+{% set youtube_id = block.youtube_id|default('') %}
+<header class="header position-relative">
+    <div class="background-effect"></div>
+    <div class="header__video-container background-cover background-center position-absolute h-100 w-100 filter-contrast-60 overflow-hidden"
+         {% if image %}style="background-image: url({{ img(image, 1440, 800, 'fill') }})"{% endif %}>
+        {% if youtube_id %}
+            <div class="embed-responsive embed-responsive-16by9 rounded box-shadow">
+                <iframe class="embed-responsive-item"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        src="https://www.youtube.com/embed/{{ youtube_id }}?playlist={{ youtube_id }}&enablejsapi=1&autoplay=1&mute=1&controls=0&showinfo=0&autohide=0&modestbranding=1&loop=1"></iframe>
+            </div>
+        {% endif %}
+    </div>
+    <div class="container header__content text-white">
+        <div class="row align-items-center h-100">
+            <div class="col-md-8 col-xl-5">
+                {% if block.title|default %}<h1 class="header__title">{{ block.title }}</h1>{% endif %}
+                {% if block.text|default %}<div class="text header__text">{{ block.text|raw }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+</header>

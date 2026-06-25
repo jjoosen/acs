@@ -1,0 +1,5 @@
+{# Sulu block: google_maps — geport van legacy content_blocks/google-maps.html.twig #}
+{% if block.iframe|default %}
+    <iframe src="{{ block.iframe }}" frameborder="0" allowfullscreen=""
+            aria-hidden="false" tabindex="0" class="google-maps"></iframe>
+{% endif %}

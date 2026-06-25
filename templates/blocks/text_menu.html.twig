@@ -1,0 +1,12 @@
+{# Sulu block: text_menu — geport van legacy content_blocks/text-menu.html.twig (zonder legacy side-menu) #}
+<div class="bg-text-menu">
+    <div class="element-2"></div>
+    <div class="container {{ margin_bottom() }}">
+        <div class="row">
+            <div class="col-md-8 mb-2 mb-md-0">
+                {% if block.title|default %}<h2>{{ block.title }}</h2>{% endif %}
+                {% if block.text|default %}<div class="text mb-3">{{ block.text|raw }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
