@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "name": "Ac|s",
+  "description": "Accountants & belastingconsulenten",
+  "icons": {
+    "60": "/build/assets/firefox_app_60x60.png",
+    "128": "/build/assets/firefox_app_128x128.png",
+    "512": "/build/assets/firefox_app_512x512.png"
+  },
+  "developer": {
+    "name": "Innomedio",
+    "url": "http://www.innomedio.be"
+  }
+}

@@ -8,6 +8,8 @@
 $base = rtrim($argv[1] ?? 'http://127.0.0.1:8000', '/');
 $legacy = $argv[2] ?? __DIR__ . '/../var/legacy.db';
 $out = $argv[3] ?? __DIR__ . '/../public_export';
+// Optioneel pad-prefix voor een project-subpad (bv. "/acs" voor GitHub Pages).
+$prefix = rtrim($argv[4] ?? '', '/');
 
 @mkdir($out, 0777, true);
 $ctx = stream_context_create(['http' => ['timeout' => 20, 'ignore_errors' => true,
@@ -58,6 +60,13 @@ foreach ($urls as $u) {
 
     // Symfony web debug toolbar verwijderen.
     $html = preg_replace('#<!-- START of Symfony Web Debug Toolbar -->.*?<!-- END of Symfony Web Debug Toolbar -->#s', '', $html);
+
+    // Pad-prefix toepassen voor een project-subpad (absolute /-paden + url(/...)).
+    if ('' !== $prefix) {
+        $html = str_replace(['="/', "='/", 'url(/', 'url("/', "url('/"],
+                            ['="' . $prefix . '/', "='" . $prefix . '/', 'url(' . $prefix . '/', 'url("' . $prefix . '/', "url('" . $prefix . '/'],
+                            $html);
+    }
 
     $rel = '/' === $u ? 'index.html' : ltrim($u, '/') . '.html';
     $path = $out . '/' . $rel;
