@@ -1,0 +1,46 @@
+name: Bulk-vertaling (DeepL)
+
+# Handmatig: vertaalt ALLE pagina's naar de gekozen taal via DeepL op de server.
+on:
+  workflow_dispatch:
+    inputs:
+      locale:
+        description: 'Doeltaal (fr of en)'
+        required: true
+        default: 'fr'
+
+concurrency:
+  group: translate
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SSH voorbereiden
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+          fi
+
+      - name: Vertalen op de server
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=120"
+          $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' DEEPL_API_KEY='${{ secrets.DEEPL_API_KEY }}' LOCALE='${{ github.event.inputs.locale }}' bash -s" <<'EOF'
+          set -e
+          cd "$DEPLOY_PATH"
+          PHP="${PHP_BIN:-php}"
+          export APP_ENV=prod
+          export DEEPL_API_KEY
+          echo "Vertalen naar: $LOCALE"
+          $PHP bin/console app:translate "$LOCALE" --source=nl
+          $PHP bin/console cache:clear
+          echo "Klaar met vertalen naar $LOCALE."
+          EOF
