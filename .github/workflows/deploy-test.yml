@@ -60,9 +60,9 @@ jobs:
           SSHPASS: ${{ secrets.SSH_PASSWORD }}
         run: |
           if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
-            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
+            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
           else
-            RSH="ssh -i ~/.ssh/id_deploy"
+            RSH="ssh -i ~/.ssh/id_deploy -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
           fi
           rsync -az --delete \
             --exclude='.git' --exclude='node_modules' \
@@ -76,9 +76,9 @@ jobs:
           SSHPASS: ${{ secrets.SSH_PASSWORD }}
         run: |
           if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
-            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
+            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
           else
-            RSH="ssh -i ~/.ssh/id_deploy"
+            RSH="ssh -i ~/.ssh/id_deploy -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
           fi
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh

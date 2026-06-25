@@ -29,21 +29,28 @@ export APP_ENV=prod
 # Root-.htaccess plaatsen (alles via public/).
 cp -f deploy/htaccess-docroot .htaccess
 
-# Schema is idempotent met schema:update; PHPCR + home altijd verzekeren.
-$PHP bin/console doctrine:schema:update --force -n || true
-$PHP bin/console doctrine:phpcr:init:dbal --if-not-exists || true
-$PHP bin/console sulu:document:initialize -n || true
-
-# Eenmalig seeden (marker var/.seeded). data.db is geen goede marker, want
-# schema:update maakt die al aan vóór het seeden.
+# Nog niet (volledig) geseed? Begin met een schone database, zodat een eerdere
+# half-afgebroken seed (bv. door SSH-timeout) geen dubbele content geeft.
 if [ ! -f var/.seeded ]; then
-  echo "Eerste deploy: content seeden ..."
-  # Seed naar schrijfbare var/ kopiëren + absoluut pad (vermijdt CANTOPEN).
+  rm -f var/data.db
+fi
+
+# Schema + PHPCR + home (idempotent; maakt op een verse SQLite alles aan).
+$PHP bin/console doctrine:schema:update --force -n
+$PHP bin/console doctrine:phpcr:init:dbal --if-not-exists || true
+$PHP bin/console sulu:document:initialize -n
+
+# Admin VÓÓR de migratie aanmaken: zo kun je meteen inloggen, ook als de
+# (lange) content-seed nog draait of opnieuw moet. Idempotent.
+$PHP bin/console sulu:security:role:create Administrator Sulu || true
+$PHP bin/console sulu:security:user:create admin Beheerder Beheerder admin@acs.be en Administrator "${ADMIN_PASSWORD:-AcsAdmin2026!}" || true
+
+# Eenmalig content seeden (marker var/.seeded).
+if [ ! -f var/.seeded ]; then
+  echo "Content seeden ..."
   cp -f deploy/seed/legacy.db var/seed.db
   SEED="$(pwd)/var/seed.db"
   $PHP bin/console app:migrate --source-dsn="pdo-sqlite:///$SEED"
-  $PHP bin/console sulu:security:role:create Administrator Sulu || true
-  $PHP bin/console sulu:security:user:create admin Beheerder Beheerder admin@acs.be en Administrator "${ADMIN_PASSWORD:-AcsAdmin2026!}" || true
   touch var/.seeded
   echo "Seed voltooid."
 else
