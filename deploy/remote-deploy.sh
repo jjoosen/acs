@@ -29,19 +29,25 @@ export APP_ENV=prod
 # Root-.htaccess plaatsen (alles via public/).
 cp -f deploy/htaccess-docroot .htaccess
 
-if [ ! -f var/data.db ]; then
-  echo "Eerste deploy: schema opbouwen + content seeden ..."
-  $PHP bin/console doctrine:schema:create -n
-  $PHP bin/console doctrine:phpcr:init:dbal --if-not-exists || true
-  $PHP bin/console sulu:document:initialize -n
-  $PHP bin/console app:migrate --source-dsn="pdo-sqlite:///$DEPLOY_PATH/deploy/seed/legacy.db"
+# Schema is idempotent met schema:update; PHPCR + home altijd verzekeren.
+$PHP bin/console doctrine:schema:update --force -n || true
+$PHP bin/console doctrine:phpcr:init:dbal --if-not-exists || true
+$PHP bin/console sulu:document:initialize -n || true
+
+# Eenmalig seeden (marker var/.seeded). data.db is geen goede marker, want
+# schema:update maakt die al aan vóór het seeden.
+if [ ! -f var/.seeded ]; then
+  echo "Eerste deploy: content seeden ..."
+  # Seed naar schrijfbare var/ kopiëren + absoluut pad (vermijdt CANTOPEN).
+  cp -f deploy/seed/legacy.db var/seed.db
+  SEED="$(pwd)/var/seed.db"
+  $PHP bin/console app:migrate --source-dsn="pdo-sqlite:///$SEED"
   $PHP bin/console sulu:security:role:create Administrator Sulu || true
   $PHP bin/console sulu:security:user:create admin Beheerder Beheerder admin@acs.be en Administrator "${ADMIN_PASSWORD:-AcsAdmin2026!}" || true
+  touch var/.seeded
+  echo "Seed voltooid."
 else
-  echo "Bestaande database gevonden: alleen schema/cache bijwerken."
-  $PHP bin/console doctrine:schema:update --force -n || true
-  $PHP bin/console doctrine:phpcr:init:dbal --if-not-exists || true
-  $PHP bin/console sulu:document:initialize -n || true
+  echo "Al geseed (var/.seeded aanwezig) — content ongemoeid gelaten."
 fi
 
 $PHP bin/console cache:clear
@@ -49,4 +55,4 @@ $PHP bin/console cache:warmup
 chmod -R 775 var || true
 
 echo "Klaar. Frontend: jouw domein/   |  Admin: jouw domein/admin  (admin / ${ADMIN_PASSWORD:-AcsAdmin2026!})"
-echo "Opnieuw seeden? Verwijder $DEPLOY_PATH/var/data.db en deploy opnieuw."
+echo "Opnieuw seeden? Verwijder $DEPLOY_PATH/var/.seeded (en evt. var/data.db) en deploy opnieuw."
