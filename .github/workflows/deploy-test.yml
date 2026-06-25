@@ -82,3 +82,33 @@ jobs:
           fi
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh
+
+      - name: Site healthcheck (live verificatie)
+        continue-on-error: true
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          BASE="${{ secrets.SITE_URL }}"
+          if [ -z "$BASE" ]; then BASE="https://goldeneye.digital"; fi
+          echo "Healthcheck op $BASE"
+          for path in "/" "/admin/"; do
+            code=$(curl -k -s -o /tmp/body -w "%{http_code}" -L --max-time 30 "$BASE$path" || echo "000")
+            echo ">>> $BASE$path -> HTTP $code"
+            if [ "$code" != "200" ] && [ "$code" != "302" ]; then
+              echo "--- eerste 1200 tekens response ---"; head -c 1200 /tmp/body; echo; echo "---"
+            fi
+          done
+          # Ook server-side checken (logs + php-versie), onafhankelijk van DNS.
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
+          else
+            RSH="ssh -i ~/.ssh/id_deploy"
+          fi
+          $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "PHP_BIN='${{ secrets.PHP_BIN }}' DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" <<'EOF'
+          cd "$DEPLOY_PATH" || exit 0
+          PHP="${PHP_BIN:-php}"
+          echo "PHP (CLI): $($PHP -v 2>&1 | head -1)"
+          echo "=== laatste prod-log ==="
+          tail -n 25 var/log/prod-*.log 2>/dev/null || tail -n 25 var/log/prod.log 2>/dev/null || echo "(geen prod-log)"
+          EOF
