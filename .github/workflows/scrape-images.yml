@@ -1,0 +1,67 @@
+name: Scrape hero-afbeeldingen (acs.be)
+
+# Handmatig: downloadt per pagina de hero-/headerafbeelding van de live acs.be
+# (de runner kan acs.be wél bereiken) en zet ze + de map op de server.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max pagina's (0 = alles)"
+        required: false
+        default: '0'
+
+concurrency:
+  group: scrape-images
+  cancel-in-progress: true
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP opzetten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, mbstring, pdo_sqlite, gd, zip, xml
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Scrapen op de runner
+        env:
+          APP_ENV: prod
+          APP_SECRET: dummyscrapesecret0000000000000000
+          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/throwaway.db"
+        run: |
+          php bin/console app:scrape-acs --base=https://www.acs.be \
+            --out=public/uploads/scraped --limit='${{ github.event.inputs.limit }}'
+          echo "=== resultaat ==="
+          ls -la public/uploads/scraped | head
+          echo "map-grootte:"; wc -c var/scraped-heroes.json || true
+          head -c 500 var/scraped-heroes.json || true; echo
+
+      - name: SSH voorbereiden
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq sshpass rsync
+          fi
+
+      - name: Naar de server kopiëren
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=120"
+          # beelden -> public/uploads/scraped (uploads wordt niet door deploy gewist)
+          rsync -az -e "$RSH" public/uploads/scraped/ \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/public/uploads/scraped/"
+          # map -> var/scraped-heroes.json
+          rsync -az -e "$RSH" var/scraped-heroes.json \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/var/scraped-heroes.json"
+          $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "cd '${{ secrets.DEPLOY_PATH }}' && PHP='${{ secrets.PHP_BIN }}'; \${PHP:-php} bin/console cache:clear --env=prod || true"
+          echo "Klaar."

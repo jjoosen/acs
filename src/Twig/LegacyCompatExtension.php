@@ -42,6 +42,7 @@ final class LegacyCompatExtension extends AbstractExtension
             new TwigFunction('setting', [$this, 'setting']),
             new TwigFunction('img', [$this, 'img']),
             new TwigFunction('navigation', [$this, 'navigation']),
+            new TwigFunction('scraped_hero', [$this, 'scrapedHero']),
             new TwigFunction('view_file_link', [$this, 'viewFileLink']),
             new TwigFunction('margin_bottom', [$this, 'marginBottom']),
             new TwigFunction('count_jobs', [$this, 'countJobs']),
@@ -113,6 +114,27 @@ final class LegacyCompatExtension extends AbstractExtension
         }
 
         return $this->navData[$tag] ?? [];
+    }
+
+    /**
+     * @var array<string,string>|null cache van var/scraped-heroes.json
+     */
+    private ?array $heroes = null;
+
+    /**
+     * Geeft het gescrapte hero-beeld (van acs.be) voor het opgegeven pad, of ''.
+     */
+    public function scrapedHero(string $path): string
+    {
+        if (null === $this->heroes) {
+            $f = \dirname(__DIR__, 2) . '/var/scraped-heroes.json';
+            $this->heroes = \is_file($f)
+                ? (json_decode((string) file_get_contents($f), true) ?: [])
+                : [];
+        }
+        $key = '/' === $path ? '/' : \rtrim($path, '/');
+
+        return (string) ($this->heroes[$key] ?? '');
     }
 
     /** Legacy: view_file_link(id) -> download/preview-URL. Stub tot media-import. */
