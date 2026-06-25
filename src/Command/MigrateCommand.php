@@ -6,7 +6,6 @@ namespace App\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -19,18 +18,20 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Migreert de legacy Innomedio BaseBundle CMS-database naar Sulu.
  *
- * Bron: MySQL-dump van `ID137795_prodacsac` (geladen in een tijdelijke DB,
- *       connectie via --source-dsn, bv. mysql://user:pass@127.0.0.1:3306/acs_legacy).
+ * Bron: MySQL-dump van `ID137795_prodacsac`, geladen in een DBAL-bron
+ *       (MySQL of — in de sandbox — SQLite) via --source-dsn.
  * Doel: Sulu PHPCR-documenten in de webspace `acs` (locale nl).
  *
- * STATUS: skelet. Pagina-boom + basis-mapping staan; per-blok veld-mapping
- *         en media-koppeling worden iteratief aangevuld (zie MIGRATION-BLUEPRINT.md).
+ * STATUS: pagina-boom + SEO + de geporte bloktypes worden gemigreerd.
+ *         Nog niet: geneste child-blokken, media-koppeling en de bloktypes
+ *         die nog geen Sulu-template hebben (zie MIGRATION-BLUEPRINT.md).
  */
 #[AsCommand(name: 'app:migrate', description: 'Migreer legacy ACS-CMS naar Sulu')]
 final class MigrateCommand extends Command
 {
     private const WEBSPACE = 'acs';
     private const LOCALE = 'nl';
+    private const HOME_PATH = '/cmf/acs/contents';
 
     /**
      * Legacy page_block.tag => Sulu block type (zoals gedefinieerd in content.xml).
@@ -43,7 +44,7 @@ final class MigrateCommand extends Command
         'usps' => 'usps',
         'image' => 'image',
         'quote' => 'quote',
-        // ... resterende 42 tags, zie blok-inventaris
+        // ... resterende bloktypes, zie blok-inventaris in de blueprint
     ];
 
     public function __construct(
@@ -76,87 +77,125 @@ final class MigrateCommand extends Command
         $source = $this->connect($dsn);
         $io->title('ACS legacy -> Sulu migratie' . ($dryRun ? ' (DRY-RUN)' : ''));
 
-        // 1) Pagina's ophalen in boom-volgorde (nested set: lft).
-        $sql = 'SELECT p.*, t.name, t.url, t.full_slug, t.meta_title, t.meta_description
+        // Pagina's in boom-volgorde (nested set: lft). Alleen met nl-vertaling.
+        $sql = 'SELECT p.id, p.parent_id, p.active, p.homepage, p.content_type_tag,
+                       t.name, t.url, t.full_slug, t.meta_title, t.meta_description
                 FROM page p
-                LEFT JOIN page_translation t ON t.page_id = p.id AND t.language_id = :loc
-                ORDER BY p.lft ASC';
+                INNER JOIN page_translation t ON t.page_id = p.id AND t.language_id = :loc
+                ORDER BY p.homepage DESC, p.lft ASC';
         $pages = $source->executeQuery($sql, ['loc' => self::LOCALE])->fetchAllAssociative();
         if ($limit > 0) {
             $pages = \array_slice($pages, 0, $limit);
         }
-        $io->writeln(\sprintf('%d pagina\'s gevonden.', \count($pages)));
+        $io->writeln(\sprintf('%d pagina\'s (met nl-vertaling) gevonden.', \count($pages)));
 
-        // legacy page.id => Sulu document uuid, voor parent-koppeling.
-        $idToUuid = [];
+        $homeDocument = $this->documentManager->find(self::HOME_PATH, self::LOCALE);
+
+        // legacy page.id => Sulu document (voor parent-koppeling).
+        $idToDoc = [];
         $created = 0;
+        $updated = 0;
+        $skipped = 0;
+        $blockStats = [];
 
         foreach ($pages as $row) {
             $legacyId = (int) $row['id'];
-            $title = (string) ($row['name'] ?? 'Zonder titel');
-            $slug = $this->resolveUrl($row);
+            $title = \trim((string) ($row['name'] ?? ''));
+            if ('' === $title) {
+                ++$skipped;
+                continue;
+            }
+            $isHome = 1 === (int) $row['homepage'];
+            $slug = $isHome ? '/' : $this->resolveUrl($row);
 
-            $io->writeln(\sprintf('  - [%d] %s  (%s)', $legacyId, $title, $slug));
+            $blocks = $this->mapBlocks($source, $legacyId, $blockStats);
 
             if ($dryRun) {
+                $io->writeln(\sprintf('  - [%d] %s (%s) — %d blokken', $legacyId, $title, $slug, \count($blocks)));
                 continue;
             }
 
-            /** @var PageDocument $doc */
-            $doc = $this->documentManager->create('page');
-            $doc->setTitle($title);
-            $doc->setResourceSegment($slug);
-            $doc->setStructureType('content');
-            $doc->setWorkflowStage(
-                (int) $row['active'] === 1 ? WorkflowStage::PUBLISHED : WorkflowStage::TEST
-            );
+            try {
+                if ($isHome) {
+                    /** @var \Sulu\Component\Content\Document\Behavior\StructureBehavior $doc */
+                    $doc = $homeDocument;
+                    $doc->setTitle($title);
+                } else {
+                    $doc = $this->documentManager->create('page');
+                    $doc->setTitle($title);
+                    $doc->setResourceSegment($slug);
+                    $parent = $idToDoc[(int) $row['parent_id']] ?? $homeDocument;
+                    $doc->setParent($parent);
+                }
 
-            $structure = $doc->getStructure();
-            $structure->bind([
-                'title' => $title,
-                'url' => $slug,
-                'blocks' => $this->mapBlocks($source, $legacyId),
-            ], false);
+                $doc->setStructureType('content');
+                $doc->setWorkflowStage(
+                    1 === (int) $row['active'] ? WorkflowStage::PUBLISHED : WorkflowStage::TEST
+                );
 
-            // Extension: SEO (meta_title / meta_description)
-            $doc->setExtensionsData([
-                'seo' => [
-                    'title' => (string) ($row['meta_title'] ?? ''),
-                    'description' => (string) ($row['meta_description'] ?? ''),
-                ],
-            ]);
+                $doc->getStructure()->bind([
+                    'title' => $title,
+                    'url' => $slug,
+                    'blocks' => $blocks,
+                ], false);
 
-            $parentUuid = isset($row['parent_id'], $idToUuid[(int) $row['parent_id']])
-                ? $idToUuid[(int) $row['parent_id']]
-                : null;
+                $doc->setExtensionsData([
+                    'seo' => [
+                        'title' => (string) ($row['meta_title'] ?? ''),
+                        'description' => (string) ($row['meta_description'] ?? ''),
+                    ],
+                ]);
 
-            $this->documentManager->persist($doc, self::LOCALE, [
-                'parent_path' => $parentUuid ? null : '/cmf/' . self::WEBSPACE . '/contents',
-                'parent_document' => $parentUuid,
-            ]);
-            $this->documentManager->publish($doc, self::LOCALE);
+                $this->documentManager->persist($doc, self::LOCALE, [
+                    'parent_path' => self::HOME_PATH,
+                ]);
+                if (1 === (int) $row['active']) {
+                    $this->documentManager->publish($doc, self::LOCALE);
+                }
+                $this->documentManager->flush();
 
-            $idToUuid[$legacyId] = $doc->getUuid();
-            ++$created;
+                $idToDoc[$legacyId] = $doc;
+                $isHome ? $updated++ : $created++;
+            } catch (\Throwable $e) {
+                ++$skipped;
+                $io->writeln(\sprintf('  ! overslaan [%d] %s: %s', $legacyId, $title, $e->getMessage()));
+                $this->documentManager->clear();
+                $homeDocument = $this->documentManager->find(self::HOME_PATH, self::LOCALE);
+            }
         }
 
-        $this->documentManager->flush();
+        if (!$dryRun) {
+            $this->documentManager->flush();
+        }
 
-        $io->success(\sprintf('%d pagina\'s gemigreerd.', $created));
+        $io->section('Blok-mapping');
+        foreach ($blockStats as $tag => $n) {
+            $io->writeln(\sprintf('  %-22s %d', $tag, $n));
+        }
+
+        $io->success(\sprintf(
+            '%d aangemaakt, %d bijgewerkt (home), %d overgeslagen.',
+            $created, $updated, $skipped
+        ));
 
         return Command::SUCCESS;
     }
 
     /**
-     * Bouwt de Sulu block-array uit page_block (incl. nesting via parent_id),
-     * met uitgelezen (PHP-geserialiseerde) velden.
+     * Bouwt de Sulu block-array uit page_block: alleen actieve root-blokken
+     * (parent_id IS NULL) van bloktypes die al een Sulu-template hebben.
+     * Geneste children en media-velden volgen iteratief.
+     *
+     * @param array<string,int> $stats
      *
      * @return array<int, array<string, mixed>>
      */
-    private function mapBlocks(Connection $source, int $pageId): array
+    private function mapBlocks(Connection $source, int $pageId, array &$stats): array
     {
         $rows = $source->executeQuery(
-            'SELECT * FROM page_block WHERE page_id = :pid AND parent_id IS NULL ORDER BY sort_order ASC',
+            'SELECT tag, fields FROM page_block
+             WHERE page_id = :pid AND parent_id IS NULL AND active = 1
+             ORDER BY sort_order ASC',
             ['pid' => $pageId]
         )->fetchAllAssociative();
 
@@ -164,17 +203,19 @@ final class MigrateCommand extends Command
         foreach ($rows as $row) {
             $tag = (string) $row['tag'];
             $type = self::BLOCK_MAP[$tag] ?? null;
+            $stats[$tag ?: '(leeg)'] = ($stats[$tag ?: '(leeg)'] ?? 0) + 1;
             if (null === $type) {
-                continue; // nog niet geport; wordt aangevuld
+                continue; // bloktype nog niet geport
             }
 
             $fields = $this->unserializeFields($row['fields'] ?? null);
             $block = ['type' => $type];
             foreach ($fields as $key => $value) {
-                // velden komen 1:1 over; media-refs worden later naar Sulu media-id's vertaald
-                $block[$key] = $this->normalizeFieldValue($value);
+                if (\is_array($value)) {
+                    continue; // media-/child-refs: nog niet gekoppeld
+                }
+                $block[$key] = $value;
             }
-
             $blocks[] = $block;
         }
 
@@ -182,7 +223,7 @@ final class MigrateCommand extends Command
     }
 
     /**
-     * Legacy `fields` is een PHP-geserialiseerde array, soms per-taal:
+     * Legacy `fields` is een PHP-geserialiseerde array, meestal per-taal:
      *   a:1:{s:5:"title";a:1:{s:2:"nl";s:5:"Hallo";}}
      * We platten naar de nl-waarde.
      *
@@ -211,21 +252,12 @@ final class MigrateCommand extends Command
         return $out;
     }
 
-    private function normalizeFieldValue(mixed $value): mixed
-    {
-        if (\is_bool($value)) {
-            return $value;
-        }
-        if (null === $value) {
-            return '';
-        }
-
-        return $value;
-    }
-
     private function resolveUrl(array $row): string
     {
-        $slug = (string) ($row['full_slug'] ?? $row['url'] ?? '');
+        $slug = (string) ($row['full_slug'] ?? '');
+        if ('' === $slug) {
+            $slug = (string) ($row['url'] ?? '');
+        }
         $slug = '/' . \ltrim($slug, '/');
 
         return '/' === $slug ? '/' : \rtrim($slug, '/');

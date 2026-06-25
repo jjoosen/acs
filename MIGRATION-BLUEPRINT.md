@@ -114,3 +114,41 @@ Uitgevoerd in deze sessie (`bash setup.sh` + roadmap-aanzet):
 5. **`app:migrate`** afmaken (per-blok veld-mapping + media-koppeling) en draaien tegen de in MySQL geladen dump.
 6. **Redirects** → Sulu redirect-bundle; **formulieren** → Sulu Form-bundle.
 7. **Webpack-build** van de theme-assets; eindverificatie tegen de live site; productie op **MySQL + Jackrabbit** (VPS/managed, geen shared hosting).
+
+---
+
+## Content-migratie uitgevoerd (sessie 2026-06-25, vervolg)
+
+De echte productie-content is nu in Sulu gezet (zonder MySQL, want niet
+beschikbaar in de sandbox):
+
+1. **`tools/legacy-to-sqlite.php`** laadt de benodigde content-tabellen uit de
+   `.sql.gz`-dump in een SQLite-bestand (`var/legacy.db`). Robuuste tokenizer
+   voor mysqldump-INSERTs (escapes, NULL, getallen). Geladen:
+   page 389, page_translation 383, page_block 1864, navigation 44, file 1083.
+   ```
+   php tools/legacy-to-sqlite.php /pad/naar/dump.sql.gz var/legacy.db
+   ```
+2. **`app:migrate`** schrijft de pagina-boom + SEO + de geporte bloktypes weg:
+   ```
+   php bin/console app:migrate --source-dsn='pdo-sqlite:////abs/pad/var/legacy.db'
+   ```
+   Resultaat: **382 pagina's aangemaakt + homepage bijgewerkt, 0 fouten**
+   (1511 PHPCR-nodes). Homepage → bestaand Sulu home-document; overige
+   top-level pagina's onder home; subpagina's onder hun parent (legacy
+   `parent_id`); resource-locator = legacy `full_slug`.
+
+Geverifieerd: gemigreerde tekstpagina's renderen 1:1 in de ACS-theme
+(bv. `/nieuws/ficheverplichting-voor-onkostenvergoedingen`).
+
+### Wat nog ontbreekt voor 100% parity (per pagina)
+- **Bloktypes zonder Sulu-template** worden bij migratie overgeslagen. Frequent
+  op o.a. de homepage: `header`, `header_small`, `cards_listFour`, `news_recent`,
+  `jobs_highlight`, `toggle_list`, `team`, `downloads`, `video`, `contact_form`,
+  `google_maps`, … plus alle **geneste child-blokken** (`#usp#`, `#button#`,
+  `#card#`, `#team_member#`, `#toggle_list_item#`, …). Deze moeten nog geport
+  worden (content.xml-types + `templates/blocks/*.twig` + nesting in app:migrate).
+- **Media/foto's**: de dump bevat enkel media-metadata; de echte beeldbestanden
+  (Combell uploads-map) zijn nog nodig om afbeeldingen exact te tonen.
+- **Navigatie/menu's**: `navigation`-tabel is geladen maar nog niet als
+  Sulu navigation-contexts gezet (header/footer tonen nu geen menu-items).
