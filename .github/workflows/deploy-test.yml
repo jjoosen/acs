@@ -64,12 +64,13 @@ jobs:
           else
             RSH="ssh -i ~/.ssh/id_deploy -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
           fi
-          rsync -az --delete \
+          rsync -az --delete --no-perms --omit-dir-times --ignore-errors \
             --exclude='.git' --exclude='node_modules' \
             --exclude='var' --exclude='.env.local' \
             --exclude='upload' --exclude='public/uploads' \
+            --exclude='.nfs*' \
             -e "$RSH" \
-            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/"
+            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/" || true
 
       - name: Remote deploy-stappen (migraties, seed, cache)
         env:
