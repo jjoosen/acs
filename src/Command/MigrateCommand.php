@@ -33,6 +33,9 @@ final class MigrateCommand extends Command
     private const LOCALE = 'nl';
     private const HOME_PATH = '/cmf/acs/contents';
 
+    /** Aantal pagina's per flush (batching i.p.v. fsync per pagina). */
+    private const FLUSH_EVERY = 50;
+
     /**
      * Legacy page_block.tag => Sulu block type (zoals gedefinieerd in content.xml).
      * Vul aan naarmate bloktypes geport worden.
@@ -142,6 +145,7 @@ final class MigrateCommand extends Command
         $created = 0;
         $updated = 0;
         $skipped = 0;
+        $processed = 0;
         $blockStats = [];
 
         foreach ($pages as $row) {
@@ -198,9 +202,14 @@ final class MigrateCommand extends Command
                 if (1 === (int) $row['active']) {
                     $this->documentManager->publish($doc, self::LOCALE);
                 }
-                $this->documentManager->flush();
-
+                // UUID is al toegekend bij persist; nodig voor parent-koppeling.
                 $idToUuid[$legacyId] = $doc->getUuid();
+
+                // Flush in batches i.p.v. per pagina: op NFS-SQLite is een fsync
+                // per pagina (382x) de grote bottleneck van de reseed.
+                if (0 === (++$processed % self::FLUSH_EVERY)) {
+                    $this->documentManager->flush();
+                }
                 $isHome ? $updated++ : $created++;
             } catch (\Throwable $e) {
                 ++$skipped;
