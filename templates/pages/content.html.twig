@@ -1,6 +1,25 @@
 {% extends "frontend/base.html.twig" %}
 
 {% block content %}
+    {# Pagina-brede hero-fallback: toon de gescrapete acs.be-hero met titel op
+       pagina's die zelf geen header(-small)-blok hebben. #}
+    {% set _hero = scraped_hero(app.request.pathinfo) %}
+    {% set _has_header = false %}
+    {% for b in content.blocks %}
+        {% if b.type|default('') in ['header', 'header_small'] %}{% set _has_header = true %}{% endif %}
+    {% endfor %}
+    {% if _hero and not _has_header %}
+        <header class="header-small position-relative {{ margin_bottom() }}">
+            <div class="header-small__image position-absolute h-100 w-100 filter-contrast-60"
+                 style="background-image: linear-gradient(0deg, rgba(81,136,250,.55), rgba(81,136,250,.55)), url({{ _hero }})"></div>
+            <div class="container header-small__content text-white">
+                <div class="row align-items-center h-100">
+                    <div class="col-12"><h1 class="header__title">{{ content.title|default('') }}</h1></div>
+                </div>
+            </div>
+        </header>
+    {% endif %}
+
     {% for block in content.blocks %}
         {% set tpl = 'blocks/' ~ block.type ~ '.html.twig' %}
         {{ include(tpl, { block: block, loop: loop }, ignore_missing = true) }}
