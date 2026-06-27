@@ -145,8 +145,14 @@ jobs:
               echo "$scheme://127.0.0.1$u -> $c"
             done
           done
-          echo "=== navigation.json op server ==="; ls -la "$DEPLOY_PATH/var/navigation.json" 2>&1; head -c 400 "$DEPLOY_PATH/var/navigation.json" 2>&1; echo
+          echo "=== var/*.json op server ==="; ls -la "$DEPLOY_PATH/var/"*.json 2>&1
+          echo "--- scraped-heroes.json (eerste 200) ---"; head -c 200 "$DEPLOY_PATH/var/scraped-heroes.json" 2>&1; echo
+          echo "--- block-images.json (eerste 200) ---"; head -c 200 "$DEPLOY_PATH/var/block-images.json" 2>&1; echo
+          echo "--- aantal scraped-bestanden ---"; ls "$DEPLOY_PATH/public/uploads/scraped/" 2>/dev/null | wc -l
+          echo "--- homepage header-block legacy_id + scraped_hero test ---"
+          $PHP "$DEPLOY_PATH/bin/console" debug:twig 2>/dev/null | grep -i block_images || echo "(block_images functie niet gevonden in twig)"
           echo "=== bevat live homepage een menu-item? ==="; curl -k -s -L --max-time 20 "https://goldeneye.digital/" | grep -c "main-nav__item" || echo 0
+          echo "=== homepage header style-attribuut (bg) ==="; curl -k -s -L --max-time 20 "https://goldeneye.digital/" | grep -oE 'header__video-container[^>]{0,160}' | head -1
           echo "=== inhoud www_before_autogit ==="; ls -la "$WBA" 2>&1 | head
           echo "=== autogit config ==="; cat "$BASE/autogit.yml" 2>/dev/null || echo "(geen autogit.yml)"; cat "$BASE/.webhosting/"* 2>/dev/null | head -40
           EOF
