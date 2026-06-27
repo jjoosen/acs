@@ -105,12 +105,18 @@ jobs:
               echo "--- eerste 800 tekens response ---"; head -c 800 /tmp/body; echo; echo "---"
             fi
           done
-          echo "===== CHECK /profielen/ondernemer ====="
-          OB=$(curl -k -s -L --max-time 30 "$BASE/profielen/ondernemer")
-          echo "bytes=$(printf '%s' "$OB" | wc -c)  marathon-hits=$(printf '%s' "$OB" | grep -c 'marathon')"
-          echo "===== VOLLEDIGE HOMEPAGE-HTML ====="
-          curl -k -s -L --max-time 30 "$BASE/" | head -c 4000
-          echo; echo "===== EINDE HOMEPAGE ====="
+          echo "===== HERO-BEELD CHECK (background-image .../uploads/scraped/...) ====="
+          for path in "/" "/profielen/ondernemer" "/onze-expertise"; do
+            HTML=$(curl -k -s -L --max-time 30 "$BASE$path")
+            bytes=$(printf '%s' "$HTML" | wc -c)
+            scraped=$(printf '%s' "$HTML" | grep -o 'background-image[^"]*uploads/scraped[^")]*' | head -1)
+            bgcount=$(printf '%s' "$HTML" | grep -c 'background-image')
+            h1=$(printf '%s' "$HTML" | grep -o '<h1[^>]*>[^<]*' | head -1)
+            echo ">>> $path  bytes=$bytes  background-image-count=$bgcount"
+            echo "    hero: ${scraped:-<GEEN scraped-url gevonden>}"
+            echo "    h1  : ${h1:-<geen h1>}"
+          done
+          echo "===== EINDE HERO-CHECK ====="
           # Ook server-side checken (logs + php-versie), onafhankelijk van DNS.
           if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
             RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
