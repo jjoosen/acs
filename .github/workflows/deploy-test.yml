@@ -70,7 +70,7 @@ jobs:
             --exclude='upload' --exclude='public/uploads' \
             --exclude='.nfs*' \
             -e "$RSH" \
-            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/" || true
+            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:acs/" || true
 
       - name: Remote deploy-stappen (migraties, seed, cache)
         env:
@@ -82,7 +82,7 @@ jobs:
             RSH="ssh -i ~/.ssh/id_deploy -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
           fi
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh
+            "DEPLOY_PATH='acs' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh
 
       - name: Site healthcheck (live verificatie)
         continue-on-error: true
@@ -118,7 +118,7 @@ jobs:
             RSH="ssh -i ~/.ssh/id_deploy"
           fi
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "PHP_BIN='${{ secrets.PHP_BIN }}' DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" <<'EOF'
+            "PHP_BIN='${{ secrets.PHP_BIN }}' DEPLOY_PATH='acs' bash -s" <<'EOF'
           set +e
           PHP="${PHP_BIN:-php}"
           BASE="$(dirname "$DEPLOY_PATH")"

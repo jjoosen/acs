@@ -37,7 +37,7 @@ jobs:
         run: |
           RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=120"
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' PHP_BIN='${{ secrets.PHP_BIN }}' DEEPL_API_KEY='${{ secrets.DEEPL_API_KEY }}' LOCALE='${{ github.event.inputs.locale }}' LIMIT='${{ github.event.inputs.limit }}' bash -s" <<'EOF'
+            "DEPLOY_PATH='acs' PHP_BIN='${{ secrets.PHP_BIN }}' DEEPL_API_KEY='${{ secrets.DEEPL_API_KEY }}' LOCALE='${{ github.event.inputs.locale }}' LIMIT='${{ github.event.inputs.limit }}' bash -s" <<'EOF'
           set -e
           cd "$DEPLOY_PATH"
           PHP="${PHP_BIN:-php}"

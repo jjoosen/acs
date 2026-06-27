@@ -58,10 +58,10 @@ jobs:
           RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=120"
           # beelden -> public/uploads/scraped (uploads wordt niet door deploy gewist)
           rsync -az -e "$RSH" public/uploads/scraped/ \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/public/uploads/scraped/"
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:acs/public/uploads/scraped/"
           # map -> var/scraped-heroes.json
           rsync -az -e "$RSH" var/scraped-heroes.json \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/var/scraped-heroes.json"
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:acs/var/scraped-heroes.json"
           $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "cd '${{ secrets.DEPLOY_PATH }}' && PHP='${{ secrets.PHP_BIN }}'; \${PHP:-php} bin/console cache:clear --env=prod || true"
+            "cd 'acs' && PHP='${{ secrets.PHP_BIN }}'; \${PHP:-php} bin/console cache:clear --env=prod || true"
           echo "Klaar."
