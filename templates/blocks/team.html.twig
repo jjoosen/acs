@@ -1,0 +1,35 @@
+{# Sulu block: team — geport van content_blocks/team.html.twig #}
+{% set members = block.members|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+{% if members %}
+    <div id="block-{{ block.legacy_id|default('') }}" class="container {{ margin_bottom() }}">
+        {% if block.title|default or block.text|default %}
+            <div class="row mb-3">
+                <div class="col-lg-7">
+                    {% if block.title|default %}<h2 class="mb-1">{{ block.title }}</h2>{% endif %}
+                    {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row text-center text-sm-left">
+            {% for member in members %}
+                {% set image = imgs[loop.index0]|default('') %}
+                <div class="col-lg-6 mb-3 pb-1">
+                    {% if image %}<img src="{{ image }}" alt="{{ member.title|default('') }}" class="mw-100 d-inline-block rounded-circle align-top mr-sm-3" style="width:140px;height:140px;object-fit:cover" loading="lazy">{% endif %}
+                    <div class="d-inline-block font-size-16">
+                        <h3 class="mb-0">{{ member.title|default('') }}</h3>
+                        <div>{{ member.function|default('') }}</div>
+                        <div class="mt-1">
+                            {% if member.email|default %}
+                                <a href="mailto:{{ member.email }}" class="d-block text-decoration-none"><i class="icon icon-email mr-10px"></i> {{ member.email }}</a>
+                            {% endif %}
+                            {% if member.phone|default %}
+                                <a href="tel:{{ member.phone|replace({' ': ''}) }}" class="d-block"><i class="icon icon-phone mr-10px"></i> {{ member.phone }}</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

@@ -1,0 +1,31 @@
+{# Sulu block: downloads — geport van content_blocks/downloads.html.twig #}
+{% set items = block.items|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+{% if items %}
+    <div id="block-{{ block.legacy_id|default('') }}" class="{{ margin_bottom() }}">
+        {% if block.title|default or block.text|default %}
+            <div class="container">
+                <div class="row"><div class="col-lg-10"><div class="mb-3">
+                    {% if block.title|default %}<h2>{{ block.title }}</h2>{% endif %}
+                    {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
+                </div></div></div>
+            </div>
+        {% endif %}
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                {% for item in items %}
+                    {% set image = imgs[loop.index0]|default('') %}
+                    <div class="col mb-2">
+                        <div class="card">
+                            {% if image %}<img src="{{ image }}" alt="{{ item.title|default('') }}" class="card__img w-100" loading="lazy">{% endif %}
+                            <div class="card__body">
+                                {% if item.title|default %}<h3 class="h3 card__title">{{ item.title }}</h3>{% endif %}
+                                {% if item.text|default %}<div class="card__text mb-2">{{ item.text|raw }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}

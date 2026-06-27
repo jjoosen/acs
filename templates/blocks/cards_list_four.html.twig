@@ -1,0 +1,38 @@
+{# Sulu block: cards_list_four — geport van content_blocks/cards-list-four.html.twig #}
+{% set cards = block.cards|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<div id="block-{{ block.legacy_id|default('') }}" class="bg-cards-list">
+    <div class="element-3"></div>
+    <section class="cards-list {{ margin_bottom() }}">
+        <div class="container">
+            {% if block.title|default or block.text|default %}
+                <div class="row mb-5">
+                    <div class="col-8">
+                        {% if block.title|default %}<h2>{{ block.title }}</h2>{% endif %}
+                        {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="row">
+                {% for card in cards %}
+                    {% set image = imgs[loop.index0]|default('') %}
+                    {% set link = card.button_link|default('') %}
+                    <div class="col-md-6 col-lg-3 mb-32px">
+                        <{% if link %}a href="{{ link }}"{% else %}div style="pointer-events:none;"{% endif %} class="card d-flex flex-column">
+                            {% if image %}<img src="{{ image }}" alt="{{ card.title|default('') }}" class="card__img w-100" loading="lazy">{% endif %}
+                            <div class="card__body flex-grow-1">
+                                <h4 class="card__title">{{ card.title|default('') }}</h4>
+                                {% if card.text|default %}<div class="card__text">{{ card.text|raw }}</div>{% endif %}
+                            </div>
+                            {% if link %}
+                                <div class="card__footer">
+                                    <div class="btn btn--arrow btn--arrow-bg {{ card.button_type|default('') }}">{{ card.button_title|default('Lees meer'|trans) }}</div>
+                                </div>
+                            {% endif %}
+                        </{% if link %}a{% else %}div{% endif %}>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>

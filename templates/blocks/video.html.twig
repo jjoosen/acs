@@ -1,5 +1,6 @@
 {# Sulu block: video — geport van legacy content_blocks/video.html.twig #}
 {% set image = (block.image|default([]))|first %}
+{% set src = image ? img(image, 1600, 900, 'fit') : (block_images(block.legacy_id|default(''))|first|default('')) %}
 {% set youtube_id = block.youtube_id|default('') %}
 <div class="container mb-6">
     <div class="row text-center justify-content-center">
@@ -17,8 +18,8 @@
                             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                             src="https://www.youtube.com/embed/{{ youtube_id }}?enablejsapi=1"></iframe>
                 </div>
-            {% elseif image %}
-                <img class="rounded box-shadow w-100" src="{{ img(image, 1600, 900, 'fit') }}" alt="{{ image.title }}" loading="lazy">
+            {% elseif src %}
+                <img class="rounded box-shadow w-100" src="{{ src }}" alt="{{ block.title|default('') }}" loading="lazy">
             {% endif %}
         </div>
     </div>

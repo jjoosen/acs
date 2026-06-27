@@ -1,0 +1,18 @@
+{# Sulu block: images_link — geport van content_blocks/images-link.html.twig #}
+{% set items = block.items|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<div id="block-{{ block.legacy_id|default('') }}" class="container {{ margin_bottom() }}">
+    {% if block.title|default %}<h2 class="d-flex align-items-center">{{ block.title }}</h2>{% endif %}
+    {% if items %}
+        <div class="row justify-content-around align-items-center">
+            {% for item in items %}
+                {% set image = imgs[loop.index0]|default('') %}
+                <div class="col-6 col-md-3 mb-3 text-center">
+                    {% if item.link|default %}<a href="{{ item.link }}">{% endif %}
+                        {% if image %}<img src="{{ image }}" alt="{{ item.title|default('') }}" class="mw-100" loading="lazy">{% endif %}
+                    {% if item.link|default %}</a>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

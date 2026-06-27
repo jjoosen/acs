@@ -1,0 +1,34 @@
+{# Sulu block: cards_list — geport van content_blocks/cards-list.html.twig #}
+{% set cards = block.cards|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<div id="block-{{ block.legacy_id|default('') }}" class="bg-cards-list">
+    <div class="element-3"></div>
+    <section class="cards-list {{ margin_bottom() }}">
+        <div class="container">
+            {% if block.title|default or block.text|default %}
+                <div class="row mb-5">
+                    <div class="col-8">
+                        {% if block.title|default %}<h2>{{ block.title }}</h2>{% endif %}
+                        {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="row">
+                {% for card in cards %}
+                    {% set image = imgs[loop.index0]|default('') %}
+                    {% set link = card.link|default('') %}
+                    <div class="col-md-6 col-lg-4 mb-32px">
+                        <{% if link %}a href="{{ link }}"{% else %}div style="pointer-events:none;"{% endif %} class="card">
+                            {% if image %}<img src="{{ image }}" alt="{{ card.title|default('') }}" class="card__img w-100" loading="lazy">{% endif %}
+                            <div class="card__body">
+                                <h4 class="card__title">{{ card.title|default('') }}</h4>
+                                {% if card.text|default %}<div class="card__text">{{ card.text|raw }}</div>{% endif %}
+                                {% if link %}<div class="btn btn--arrow btn--arrow-primary">{{ "Lees meer"|trans }}</div>{% endif %}
+                            </div>
+                        </{% if link %}a{% else %}div{% endif %}>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,17 +1,24 @@
 {# Sulu block: usps — geport van legacy content_blocks/usps.html.twig #}
-{% set image = (block.image|default([]))|first %}
-<div class="usps {{ margin_bottom() }}" {% if block.bg_color|default %}style="background-color: {{ block.bg_color }}"{% endif %}>
-    <div class="container py-4">
-        <div class="row align-items-center">
-            {% if image %}
-                <div class="col-md-4">
-                    <img class="img-fluid" src="{{ img(image, 400, 400) }}" alt="{{ image.title }}" loading="lazy">
+{% set items = block.items|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<div id="block-{{ block.legacy_id|default('') }}" class="{{ block.bg_color|default('') }} {{ margin_bottom() }} {% if block.bg_color|default %}py-3 py-lg-4{% endif %}">
+    <div class="container">
+        {% if block.title|default %}
+            <div class="text-center mb-5"><h2>{{ block.title }}</h2></div>
+        {% endif %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-{% if items|length % 3 == 0 %}3{% else %}4{% endif %} justify-content-center gap-3">
+            {% for usp in items %}
+                {% set icon = imgs[loop.index0]|default('') %}
+                <div class="col text-center d-flex flex-column mb-3">
+                    {% if icon %}
+                        <div class="w-100 mb-2"><img src="{{ icon }}" alt="{{ usp.title|default('') }}" class="mw-100" style="max-height:80px" loading="lazy"></div>
+                    {% endif %}
+                    <div>
+                        <h3 class="h4">{{ usp.title|default('') }}</h3>
+                        {% if usp.text|default %}<div class="text">{{ usp.text|raw }}</div>{% endif %}
+                    </div>
                 </div>
-            {% endif %}
-            <div class="{% if image %}col-md-8{% else %}col-12{% endif %}">
-                {% if block.title|default %}<h2>{{ block.title }}</h2>{% endif %}
-                {% if block.text|default %}<div class="text">{{ block.text|raw }}</div>{% endif %}
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

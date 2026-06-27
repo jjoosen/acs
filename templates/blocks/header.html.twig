@@ -1,11 +1,11 @@
 {# Sulu block: header (hero) — geport van legacy content_blocks/header.html.twig #}
 {% set image = (block.image|default([]))|first %}
 {% set youtube_id = block.youtube_id|default('') %}
-{% set scraped_bg = scraped_hero(app.request.pathinfo) %}
+{% set scraped_bg = image ? img(image, 1440, 800, 'fill') : (block_images(block.legacy_id|default(''))|first|default(scraped_hero(app.request.pathinfo))) %}
 <header class="header position-relative">
     <div class="background-effect"></div>
     <div class="header__video-container background-cover background-center position-absolute h-100 w-100 filter-contrast-60 overflow-hidden"
-         {% if image %}style="background-image: url({{ img(image, 1440, 800, 'fill') }})"{% elseif scraped_bg %}style="background-image: url({{ scraped_bg }})"{% endif %}>
+         {% if scraped_bg %}style="background-image: url({{ scraped_bg }})"{% endif %}>
         {% if youtube_id %}
             <div class="embed-responsive embed-responsive-16by9 rounded box-shadow">
                 <iframe class="embed-responsive-item"

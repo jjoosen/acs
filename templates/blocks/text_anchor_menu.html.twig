@@ -1,0 +1,29 @@
+{# Sulu block: text_anchor_menu — geport van content_blocks/text-anchor-menu.html.twig #}
+{% set items = block.items|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+{% set urlReplacements = {' & ': '-', ' ': '-', '|': ''} %}
+<div id="block-{{ block.legacy_id|default('') }}" class="container {{ margin_bottom() }}">
+    <div class="row">
+        <div class="col-3 d-none d-lg-block">
+            <ul class="side-menu side-menu--sticky list-unstyled mt-2 mt-lg-3 mb-4">
+                {% for item in items %}
+                    {% set id = item.title|default('')|lower|replace(urlReplacements) %}
+                    <li class="side-menu__item js-side-menu-item" data-item="{{ id }}">
+                        <a class="side-menu__link" href="#{{ id }}">{{ item.title|default('') }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-lg-9 col-xl-8">
+            {% for item in items %}
+                {% set id = item.title|default('')|lower|replace(urlReplacements) %}
+                {% set image = imgs[loop.index0]|default('') %}
+                <div id="{{ id }}" class="border-bottom py-2 py-lg-3 js-anchor-item">
+                    {% if loop.first %}<h1 class="text-primary">{{ item.title|default('') }}</h1>{% else %}<h2>{{ item.title|default('') }}</h2>{% endif %}
+                    {% if item.text|default %}<div class="text">{{ item.text|raw }}</div>{% endif %}
+                    {% if image %}<img src="{{ image }}" alt="{{ item.title|default('') }}" class="mt-3 mw-100" loading="lazy">{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

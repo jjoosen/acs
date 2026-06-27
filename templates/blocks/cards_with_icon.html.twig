@@ -1,0 +1,35 @@
+{# Sulu block: cards_with_icon — geport van content_blocks/cards-with-icon.html.twig #}
+{% set cards = block.cards|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<section id="block-{{ block.legacy_id|default('') }}" class="cards-list {{ margin_bottom() }}">
+    <div class="container">
+        {% if block.title|default or block.link|default %}
+            <div class="row align-items-center mb-1">
+                {% if block.title|default %}
+                    <div class="col-sm-{% if block.link|default %}9{% else %}12{% endif %}"><h2 class="mb-0">{{ block.title }}</h2></div>
+                {% endif %}
+                {% if block.link|default %}
+                    <div class="col-sm-3 align-self-end text-sm-right">
+                        <a href="{{ block.link }}" class="btn btn--arrow btn--arrow-secondary font-size-16">{{ block.link_text|default('Lees meer'|trans) }}</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="row">
+            {% for card in cards %}
+                {% set icon = imgs[loop.index0]|default('') %}
+                <div class="col-sm-6 col-lg-3 mb-1">
+                    <a href="{{ card.link|default('#') }}" class="card h-100 d-flex flex-column justify-content-between pt-2 pt-md-3">
+                        <div class="text-center">
+                            {% if icon %}<img src="{{ icon }}" alt="{{ card.title|default('') }}" class="mw-100 card__img" style="max-height:65px" loading="lazy">{% endif %}
+                        </div>
+                        <div class="card__body">
+                            <h4 class="card__title text-dark mb-0">{{ card.title|default('') }}</h4>
+                            {% if card.text|default %}<div class="card__text">{{ card.text|raw }}</div>{% endif %}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

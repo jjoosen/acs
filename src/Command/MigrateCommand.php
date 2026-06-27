@@ -51,7 +51,40 @@ final class MigrateCommand extends Command
         'google_maps' => 'google_maps',
         'code' => 'code',
         'text_menu' => 'text_menu',
-        // ... resterende bloktypes, zie blok-inventaris in de blueprint
+        // bloktypes met geneste children:
+        'toggle_list' => 'toggle_list',
+        'cards_list' => 'cards_list',
+        'cards_listFour' => 'cards_list_four',
+        'cards_with_button' => 'cards_with_button',
+        'cards_with_icon' => 'cards_with_icon',
+        'team' => 'team',
+        'downloads' => 'downloads',
+        'picture_grid' => 'picture_grid',
+        'images_link' => 'images_link',
+        'text_anchor_menu' => 'text_anchor_menu',
+        'summary' => 'summary',
+        'history' => 'history',
+    ];
+
+    /**
+     * Sulu-bloktype => [child-container-property, child-bloktype].
+     * Voor deze types worden de legacy child-blokken (parent_id = blok-id)
+     * mee gemigreerd in een geneste block-property.
+     */
+    private const CHILD_MAP = [
+        'usps' => ['items', 'usp'],
+        'toggle_list' => ['items', 'toggle_item'],
+        'cards_list' => ['cards', 'card'],
+        'cards_list_four' => ['cards', 'card_four'],
+        'cards_with_button' => ['cards', 'card_button'],
+        'cards_with_icon' => ['cards', 'card_icon'],
+        'team' => ['members', 'member'],
+        'downloads' => ['items', 'download_item'],
+        'picture_grid' => ['items', 'picture'],
+        'images_link' => ['items', 'image_link'],
+        'text_anchor_menu' => ['items', 'anchor'],
+        'summary' => ['items', 'summary_item'],
+        'history' => ['items', 'history_item'],
     ];
 
     public function __construct(
@@ -329,7 +362,7 @@ final class MigrateCommand extends Command
         // op terug als er geen actieve blokken zijn, zodat die pagina's niet leeg
         // blijven (bv. /profielen/ondernemer).
         $rows = $source->executeQuery(
-            'SELECT tag, fields FROM page_block
+            'SELECT id, tag, fields FROM page_block
              WHERE page_id = :pid AND parent_id IS NULL AND active = 1
              ORDER BY sort_order ASC',
             ['pid' => $pageId]
@@ -337,7 +370,7 @@ final class MigrateCommand extends Command
 
         if ([] === $rows) {
             $rows = $source->executeQuery(
-                'SELECT tag, fields FROM page_block
+                'SELECT id, tag, fields FROM page_block
                  WHERE page_id = :pid AND parent_id IS NULL
                  ORDER BY sort_order ASC',
                 ['pid' => $pageId]
@@ -360,17 +393,74 @@ final class MigrateCommand extends Command
                 continue; // bloktype nog niet geport
             }
 
-            $block = ['type' => $type];
-            foreach ($fields as $key => $value) {
-                if (\is_array($value)) {
-                    continue; // media-/child-refs: nog niet gekoppeld
-                }
-                $block[$key] = $value;
+            $block = $this->buildBlock($type, (int) $row['id'], $fields);
+
+            // Geneste children (usps, cards, team, ...) mee migreren.
+            if (isset(self::CHILD_MAP[$type])) {
+                [$prop, $childType] = self::CHILD_MAP[$type];
+                $block[$prop] = $this->mapChildren($source, (int) $row['id'], $childType);
             }
+
             $blocks[] = $block;
         }
 
         return $blocks;
+    }
+
+    /**
+     * Leest de child-blokken (parent_id = blok-id) en zet ze om naar geneste
+     * Sulu-blokken van het gegeven child-type.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function mapChildren(Connection $source, int $parentBlockId, string $childType): array
+    {
+        $rows = $source->executeQuery(
+            'SELECT id, fields FROM page_block
+             WHERE parent_id = :pid AND active = 1
+             ORDER BY sort_order ASC',
+            ['pid' => $parentBlockId]
+        )->fetchAllAssociative();
+
+        if ([] === $rows) {
+            $rows = $source->executeQuery(
+                'SELECT id, fields FROM page_block
+                 WHERE parent_id = :pid
+                 ORDER BY sort_order ASC',
+                ['pid' => $parentBlockId]
+            )->fetchAllAssociative();
+        }
+
+        $children = [];
+        foreach ($rows as $row) {
+            $fields = $this->unserializeFields($row['fields'] ?? null);
+            $children[] = $this->buildBlock($childType, (int) $row['id'], $fields);
+        }
+
+        return $children;
+    }
+
+    /**
+     * Bouwt één block-array: type + legacy_id + alle scalaire velden.
+     *
+     * @param array<string, mixed> $fields
+     *
+     * @return array<string, mixed>
+     */
+    private function buildBlock(string $type, int $legacyId, array $fields): array
+    {
+        $block = ['type' => $type, 'legacy_id' => (string) $legacyId];
+        foreach ($fields as $key => $value) {
+            if (\is_array($value)) {
+                continue; // media-/child-refs lopen via block_images()/children
+            }
+            if ('type' === $key || 'legacy_id' === $key) {
+                continue; // bescherm de structuurvelden
+            }
+            $block[$key] = $value;
+        }
+
+        return $block;
     }
 
     /**

@@ -39,6 +39,7 @@
             <type name="text">
                 <meta><title lang="nl">Tekst</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="title_size" type="single_select">
                         <params>
@@ -59,6 +60,7 @@
             <type name="banner">
                 <meta><title lang="nl">Banner</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
                     <property name="height" type="text_line"><meta><title lang="nl">Hoogte (css)</title></meta></property>
@@ -75,6 +77,7 @@
             <type name="text_image">
                 <meta><title lang="nl">Tekst + afbeelding</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
@@ -92,13 +95,23 @@
             <type name="usps">
                 <meta><title lang="nl">USP's</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
                     <property name="bg_color" type="text_line"><meta><title lang="nl">Achtergrondkleur</title></meta></property>
-                    <property name="image" type="media_selection">
-                        <meta><title lang="nl">Afbeelding</title></meta>
-                        <params><param name="types" value="image"/></params>
-                    </property>
+                    <block name="items" default-type="usp" minOccurs="0">
+                        <meta><title lang="nl">USP-items</title></meta>
+                        <types>
+                            <type name="usp">
+                                <meta><title lang="nl">USP</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
                 </properties>
             </type>
 
@@ -106,6 +119,7 @@
             <type name="image">
                 <meta><title lang="nl">Afbeelding</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="compact" type="checkbox"><meta><title lang="nl">Compact</title></meta></property>
                     <property name="image" type="media_selection">
                         <meta><title lang="nl">Afbeelding</title></meta>
@@ -118,6 +132,7 @@
             <type name="quote">
                 <meta><title lang="nl">Quote</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
                     <property name="text_small" type="text_line"><meta><title lang="nl">Subtekst</title></meta></property>
                     <property name="center" type="checkbox"><meta><title lang="nl">Gecentreerd</title></meta></property>
@@ -128,6 +143,7 @@
             <type name="header">
                 <meta><title lang="nl">Header (hero)</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
                     <property name="youtube_id" type="text_line"><meta><title lang="nl">YouTube ID</title></meta></property>
@@ -142,6 +158,7 @@
             <type name="header_small">
                 <meta><title lang="nl">Header (klein)</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="image" type="media_selection">
                         <meta><title lang="nl">Achtergrondafbeelding</title></meta>
@@ -154,6 +171,7 @@
             <type name="text_card">
                 <meta><title lang="nl">Tekstkaart</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
@@ -168,6 +186,7 @@
             <type name="video">
                 <meta><title lang="nl">Video</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
@@ -184,6 +203,7 @@
             <type name="google_maps">
                 <meta><title lang="nl">Google Maps</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="iframe" type="text_area"><meta><title lang="nl">Iframe-URL</title></meta></property>
                 </properties>
             </type>
@@ -192,6 +212,7 @@
             <type name="code">
                 <meta><title lang="nl">Code / HTML</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="code" type="text_area"><meta><title lang="nl">Code</title></meta></property>
                 </properties>
             </type>
@@ -200,8 +221,289 @@
             <type name="text_menu">
                 <meta><title lang="nl">Tekst met menu</title></meta>
                 <properties>
+                    <property name="legacy_id" type="text_line"/>
                     <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
                     <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                </properties>
+            </type>
+
+            <!-- ====== toggle_list (accordion/FAQ) ====== -->
+            <type name="toggle_list">
+                <meta><title lang="nl">Uitklaplijst</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="no_bottom_margin" type="checkbox"><meta><title lang="nl">Geen ondermarge</title></meta></property>
+                    <block name="items" default-type="toggle_item" minOccurs="0">
+                        <meta><title lang="nl">Items</title></meta>
+                        <types>
+                            <type name="toggle_item">
+                                <meta><title lang="nl">Item</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Vraag</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Antwoord</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== cards_list ====== -->
+            <type name="cards_list">
+                <meta><title lang="nl">Kaarten</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <block name="cards" default-type="card" minOccurs="0">
+                        <meta><title lang="nl">Kaarten</title></meta>
+                        <types>
+                            <type name="card">
+                                <meta><title lang="nl">Kaart</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                    <property name="link" type="text_line"><meta><title lang="nl">Link</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== cards_list_four ====== -->
+            <type name="cards_list_four">
+                <meta><title lang="nl">Kaarten (vier)</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <block name="cards" default-type="card_four" minOccurs="0">
+                        <meta><title lang="nl">Kaarten</title></meta>
+                        <types>
+                            <type name="card_four">
+                                <meta><title lang="nl">Kaart</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                    <property name="button_link" type="text_line"><meta><title lang="nl">Knop-link</title></meta></property>
+                                    <property name="button_title" type="text_line"><meta><title lang="nl">Knop-tekst</title></meta></property>
+                                    <property name="button_type" type="text_line"><meta><title lang="nl">Knop-type</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== cards_with_button ====== -->
+            <type name="cards_with_button">
+                <meta><title lang="nl">Kaarten met knop</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <block name="cards" default-type="card_button" minOccurs="0">
+                        <meta><title lang="nl">Kaarten</title></meta>
+                        <types>
+                            <type name="card_button">
+                                <meta><title lang="nl">Kaart</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                    <property name="text_small" type="text_line"><meta><title lang="nl">Kleine tekst</title></meta></property>
+                                    <property name="link" type="text_line"><meta><title lang="nl">Link</title></meta></property>
+                                    <property name="link_text" type="text_line"><meta><title lang="nl">Linktekst</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== cards_with_icon ====== -->
+            <type name="cards_with_icon">
+                <meta><title lang="nl">Kaarten met icoon</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="link" type="text_line"><meta><title lang="nl">Link</title></meta></property>
+                    <property name="link_text" type="text_line"><meta><title lang="nl">Linktekst</title></meta></property>
+                    <block name="cards" default-type="card_icon" minOccurs="0">
+                        <meta><title lang="nl">Kaarten</title></meta>
+                        <types>
+                            <type name="card_icon">
+                                <meta><title lang="nl">Kaart</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                    <property name="link" type="text_line"><meta><title lang="nl">Link</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== team ====== -->
+            <type name="team">
+                <meta><title lang="nl">Team</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <block name="members" default-type="member" minOccurs="0">
+                        <meta><title lang="nl">Teamleden</title></meta>
+                        <types>
+                            <type name="member">
+                                <meta><title lang="nl">Teamlid</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Naam</title></meta></property>
+                                    <property name="function" type="text_line"><meta><title lang="nl">Functie</title></meta></property>
+                                    <property name="email" type="text_line"><meta><title lang="nl">E-mail</title></meta></property>
+                                    <property name="phone" type="text_line"><meta><title lang="nl">Telefoon</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== downloads ====== -->
+            <type name="downloads">
+                <meta><title lang="nl">Downloads</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <block name="items" default-type="download_item" minOccurs="0">
+                        <meta><title lang="nl">Items</title></meta>
+                        <types>
+                            <type name="download_item">
+                                <meta><title lang="nl">Download</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== picture_grid ====== -->
+            <type name="picture_grid">
+                <meta><title lang="nl">Fotogrid</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
+                    <block name="items" default-type="picture" minOccurs="0">
+                        <meta><title lang="nl">Foto's</title></meta>
+                        <types>
+                            <type name="picture">
+                                <meta><title lang="nl">Foto</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== images_link ====== -->
+            <type name="images_link">
+                <meta><title lang="nl">Afbeeldingen met link</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <block name="items" default-type="image_link" minOccurs="0">
+                        <meta><title lang="nl">Items</title></meta>
+                        <types>
+                            <type name="image_link">
+                                <meta><title lang="nl">Afbeelding-link</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="link" type="text_line"><meta><title lang="nl">Link</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== text_anchor_menu ====== -->
+            <type name="text_anchor_menu">
+                <meta><title lang="nl">Tekst met ankermenu</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <block name="items" default-type="anchor" minOccurs="0">
+                        <meta><title lang="nl">Secties</title></meta>
+                        <types>
+                            <type name="anchor">
+                                <meta><title lang="nl">Sectie</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== summary ====== -->
+            <type name="summary">
+                <meta><title lang="nl">Stappenplan</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <block name="items" default-type="summary_item" minOccurs="0">
+                        <meta><title lang="nl">Stappen</title></meta>
+                        <types>
+                            <type name="summary_item">
+                                <meta><title lang="nl">Stap</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
+                </properties>
+            </type>
+
+            <!-- ====== history (tijdlijn) ====== -->
+            <type name="history">
+                <meta><title lang="nl">Tijdlijn</title></meta>
+                <properties>
+                    <property name="legacy_id" type="text_line"/>
+                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                    <property name="title_size" type="text_line"><meta><title lang="nl">Titelgrootte</title></meta></property>
+                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                    <block name="items" default-type="history_item" minOccurs="0">
+                        <meta><title lang="nl">Gebeurtenissen</title></meta>
+                        <types>
+                            <type name="history_item">
+                                <meta><title lang="nl">Gebeurtenis</title></meta>
+                                <properties>
+                                    <property name="legacy_id" type="text_line"/>
+                                    <property name="title" type="text_line"><meta><title lang="nl">Titel</title></meta></property>
+                                    <property name="text" type="text_editor"><meta><title lang="nl">Tekst</title></meta></property>
+                                </properties>
+                            </type>
+                        </types>
+                    </block>
                 </properties>
             </type>
             </types>

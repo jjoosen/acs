@@ -43,6 +43,7 @@ final class LegacyCompatExtension extends AbstractExtension
             new TwigFunction('img', [$this, 'img']),
             new TwigFunction('navigation', [$this, 'navigation']),
             new TwigFunction('scraped_hero', [$this, 'scrapedHero']),
+            new TwigFunction('block_images', [$this, 'blockImages']),
             new TwigFunction('view_file_link', [$this, 'viewFileLink']),
             new TwigFunction('margin_bottom', [$this, 'marginBottom']),
             new TwigFunction('count_jobs', [$this, 'countJobs']),
@@ -135,6 +136,34 @@ final class LegacyCompatExtension extends AbstractExtension
         $key = '/' === $path ? '/' : \rtrim($path, '/');
 
         return (string) ($this->heroes[$key] ?? '');
+    }
+
+    /**
+     * @var array<int, list<string>>|null cache van var/block-images.json
+     */
+    private ?array $blockImages = null;
+
+    /**
+     * Geeft de (gescrapete) afbeeldings-URL's van een legacy-blok terug, in
+     * documentvolgorde. Gekoppeld op het legacy page_block.id, dat de migratie
+     * in elk blok/child bewaart. Child-beelden staan bij hun parent-id; de
+     * templates verdelen ze met de lus-index over de children.
+     *
+     * @return list<string>
+     */
+    public function blockImages(int|string|null $id): array
+    {
+        if (null === $id || '' === $id) {
+            return [];
+        }
+        if (null === $this->blockImages) {
+            $f = \dirname(__DIR__, 2) . '/var/block-images.json';
+            $this->blockImages = \is_file($f)
+                ? (json_decode((string) file_get_contents($f), true) ?: [])
+                : [];
+        }
+
+        return $this->blockImages[(int) $id] ?? [];
     }
 
     /** Legacy: view_file_link(id) -> download/preview-URL. Stub tot media-import. */

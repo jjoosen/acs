@@ -1,0 +1,30 @@
+{# Sulu block: cards_with_button — geport van content_blocks/cards-with-button.html.twig #}
+{% set cards = block.cards|default([]) %}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<section id="block-{{ block.legacy_id|default('') }}" class="cards-list mt--45px {{ margin_bottom() }}">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% for card in cards %}
+                {% set image = imgs[loop.index0]|default('') %}
+                {% set link = card.link|default('') %}
+                <div class="col-md-6 col-lg-4 mb-2">
+                    <div class="card h-100 d-flex flex-column justify-content-between card--no-hover-effect text-center py-1 py-md-3">
+                        <div>
+                            {% if image %}<img src="{{ image }}" alt="{{ card.title|default('') }}" class="mw-100 card__img" style="max-height:65px" loading="lazy">{% endif %}
+                            <div class="card__body">
+                                <h4 class="card__title">{{ card.title|default('') }}</h4>
+                                <div class="card__text">
+                                    {% if card.text|default %}{{ card.text|raw }}{% endif %}
+                                    {% if card.text_small|default %}<div class="font-size-12">{{ card.text_small }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% if link %}
+                            <a href="{{ link }}" class="btn btn--tertiary align-self-end text-center mx-auto">{{ card.link_text|default('Lees meer'|trans) }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

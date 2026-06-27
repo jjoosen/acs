@@ -1,0 +1,28 @@
+{# Sulu block: toggle_list (accordion/FAQ) — geport van content_blocks/toggle-list.html.twig #}
+{% set items = block.items|default([]) %}
+<section id="block-{{ block.legacy_id|default('') }}" class="{% if block.no_bottom_margin|default %}mb-0{% else %}{{ margin_bottom() }}{% endif %}">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% if block.title|default %}
+                <div class="col-12 mb-1"><h2 class="mb-0">{{ block.title }}</h2></div>
+            {% endif %}
+            <div class="col-12">
+                <div class="rounded box-shadow bg-primary px-1 px-md-3">
+                    {% for item in items %}
+                        {% if item.title|default and item.text|default %}
+                            <div class="font-size-18 {% if not loop.last %}border-bottom{% endif %}">
+                                <div data-toggle="collapse" data-target="#collapsable-{{ item.legacy_id|default(loop.index) }}" class="collapsed cursor-pointer py-2 font-weight-bold w-100 d-flex justify-content-between align-items-center text-white">
+                                    {{ item.title }}
+                                    <i class="icon icon-minus text-white collapse-caret font-size-20"></i>
+                                </div>
+                                <div class="collapse" id="collapsable-{{ item.legacy_id|default(loop.index) }}">
+                                    <div class="text text-white pb-2">{{ item.text|raw }}</div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

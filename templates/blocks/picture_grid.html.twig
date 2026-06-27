@@ -1,0 +1,14 @@
+{# Sulu block: picture_grid — geport van content_blocks/picture-grid.html.twig #}
+{% set imgs = block_images(block.legacy_id|default('')) %}
+<div id="block-{{ block.legacy_id|default('') }}" class="container {{ margin_bottom() }}">
+    {% if block.title|default %}
+        <h{{ block.title_size|default(2) }} class="d-flex align-items-center"><i class="icon icon-instagram-alt mr-1"></i> {{ block.title }}</h{{ block.title_size|default(2) }}>
+    {% endif %}
+    <div class="row mb-4 picture-grid__content">
+        {% for image in imgs %}
+            <div class="col-6 col-md-4 col-lg-3 mb-3">
+                <img src="{{ image }}" alt="{{ block.title|default('') }}" class="w-100 rounded" style="aspect-ratio:1;object-fit:cover" loading="lazy">
+            </div>
+        {% endfor %}
+    </div>
+</div>

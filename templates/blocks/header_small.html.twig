@@ -1,10 +1,10 @@
 {# Sulu block: header_small — geport van legacy content_blocks/header-small.html.twig #}
 {% set image = (block.image|default([]))|first %}
-{% set scraped_bg = scraped_hero(app.request.pathinfo) %}
+{% set scraped_bg = image ? img(image, 1920, 1000) : (block_images(block.legacy_id|default(''))|first|default(scraped_hero(app.request.pathinfo))) %}
 <header class="header-small position-relative {{ margin_bottom() }}">
-    <div class="header-small__image position-absolute h-100 w-100 filter-contrast-60 {% if not image and not scraped_bg %}bg-secondary-light{% endif %}"
-         {% if image %}style="background-image: linear-gradient(0deg, rgba(81,136,250,.55), rgba(81,136,250,.55)), url({{ img(image, 1920, 1000) }})"{% elseif scraped_bg %}style="background-image: linear-gradient(0deg, rgba(81,136,250,.55), rgba(81,136,250,.55)), url({{ scraped_bg }})"{% endif %}></div>
-    <div class="container header-small__content {% if not image and not scraped_bg %}text-dark{% else %}text-white{% endif %}">
+    <div class="header-small__image position-absolute h-100 w-100 filter-contrast-60 {% if not scraped_bg %}bg-secondary-light{% endif %}"
+         {% if scraped_bg %}style="background-image: linear-gradient(0deg, rgba(81,136,250,.55), rgba(81,136,250,.55)), url({{ scraped_bg }})"{% endif %}></div>
+    <div class="container header-small__content {% if not scraped_bg %}text-dark{% else %}text-white{% endif %}">
         <div class="row align-items-center h-100">
             <div class="col-12">
                 {% if block.title|default %}<h1 class="header__title">{{ block.title }}</h1>{% endif %}
