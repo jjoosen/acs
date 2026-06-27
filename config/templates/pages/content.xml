@@ -7,7 +7,9 @@
 
     <view>pages/content</view>
     <controller>Sulu\Bundle\WebsiteBundle\Controller\DefaultController::indexAction</controller>
-    <cacheLifetime>604800</cacheLifetime>
+    <!-- Testomgeving: korte cache zodat wijzigingen snel zichtbaar zijn
+         (en de reverse-proxy de pagina niet een week vasthoudt). -->
+    <cacheLifetime>60</cacheLifetime>
 
     <meta>
         <title lang="nl">Pagina</title>

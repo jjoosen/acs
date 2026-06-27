@@ -107,8 +107,9 @@ jobs:
           done
           echo "===== BEELD-CHECK (uploads/ urls in de pagina) ====="
           set +e
-          for path in "/" "/profielen/ondernemer" "/onze-expertise" "/over-ons/team"; do
-            HTML=$(curl -k -s -L --max-time 30 "$BASE$path")
+          CB="cb=$(date +%s)$RANDOM"   # cache-buster om reverse-proxy te omzeilen
+          for path in "/" "/profielen/ondernemer" "/onze-expertise" "/kerncijfers"; do
+            HTML=$(curl -k -s -L --max-time 30 -H 'Cache-Control: no-cache' "$BASE$path?$CB")
             bytes=$(printf '%s' "$HTML" | wc -c)
             up=$(printf '%s' "$HTML" | grep -o '/uploads/[a-zA-Z0-9/_.-]*' | sort -u | head -4 | tr '\n' ' ')
             upcount=$(printf '%s' "$HTML" | grep -oc '/uploads/')
