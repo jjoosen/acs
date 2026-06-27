@@ -54,12 +54,14 @@ if (\preg_match('/^\/admin(\/|$)/', $_SERVER['REQUEST_URI'])) {  // @phpstan-ign
 
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG'], $suluContext); // @phpstan-ignore-line argument.type
 
-// Comment this line if you want to use the "varnish" http
-// caching strategy. See http://sulu.readthedocs.org/en/latest/cookbook/caching-with-varnish.html
-if ('dev' !== $_SERVER['APP_ENV'] && SuluKernel::CONTEXT_WEBSITE === $suluContext) {
-    /** @var Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache $kernel */
-    $kernel = $kernel->getHttpCache();
-}
+// Testomgeving: de SuluHttpCache (Symfony reverse-proxy full-page cache) is
+// UITGESCHAKELD. Anders worden pagina's lang gecachet (s-maxage) en blijven
+// wijzigingen/beelden onzichtbaar tot de cache verloopt. Zet dit terug aan
+// voor productie (samen met een hogere cacheLifetime).
+// if ('dev' !== $_SERVER['APP_ENV'] && SuluKernel::CONTEXT_WEBSITE === $suluContext) {
+//     /** @var Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache $kernel */
+//     $kernel = $kernel->getHttpCache();
+// }
 
 // When using the HttpCache, you need to call the method in your front controller
 // instead of relying on the configuration parameter
