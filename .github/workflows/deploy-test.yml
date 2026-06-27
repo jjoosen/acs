@@ -97,6 +97,9 @@ jobs:
             code=$(curl -s -o /tmp/img -A "$UA" -w "%{http_code} %{content_type}" --max-time 25 "$u" || echo "000")
             echo "runner -> $u : $code  (bytes=$(wc -c </tmp/img 2>/dev/null))"
           done
+          echo "=== OPcache reset (FPM) ==="
+          curl -k -s --max-time 20 "$BASE/_oc.php?t=acs-oc-7Yq2"; echo
+          sleep 2
           echo "Healthcheck op $BASE"
           for path in "/" "/admin/" "/build/css/app.css" "/onze-expertise"; do
             code=$(curl -k -s -o /tmp/body -w "%{http_code}" -L --max-time 30 "$BASE$path" || echo "000")
