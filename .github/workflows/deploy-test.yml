@@ -121,8 +121,6 @@ jobs:
             echo "    img : ${up:-<GEEN /uploads/ url gevonden>}"
             echo "    h1  : ${h1:-<geen h1>}"
           done
-          echo "===== ACSDBG (diagnose) ====="
-          curl -k -s -L --max-time 30 -H 'Cache-Control: no-cache' "$BASE/?$CB" | grep -oE 'ACSDBG[0-9]?[^>]*' | head -4
           echo "===== EINDE BEELD-CHECK ====="
           # Ook server-side checken (logs + php-versie), onafhankelijk van DNS.
           if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then

@@ -3,8 +3,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="robots" content="noindex, nofollow"/>
-    <!-- ACSDBG path="{{ app.request.pathinfo }}" hero="{{ scraped_hero(app.request.pathinfo) }}" blocks="{% if content.blocks is defined %}{% for b in content.blocks %}{{ b.type|default('?') }}#{{ b.legacy_id|default('-') }};{% endfor %}{% endif %}" -->
-    <!-- ACSDBG2 blkimg4="{{ block_images(4)|join('|') }}" -->{% set _b1 = block_images(content.blocks[0].legacy_id|default('')) %}<!-- ACSDBG3 firstblock_imgs="{{ _b1|join('|') }}" -->{# tijdelijke diagnose #}
     {% include "frontend/layout/_head.html.twig" %}
 
     <meta property="og:url" content="{{ app.request.uri }}"/>
