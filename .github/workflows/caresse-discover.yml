@@ -1,0 +1,133 @@
+name: Caresse - site verkennen (discovery)
+
+# Verkent www.lingeriecaresse.be vanaf de runner (die de site wél kan bereiken)
+# en rapporteert techniek, talen, sitemap, navigatie, CSS en pagina's. Puur
+# read-only; niets wordt gedeployed. Basis voor het migratieplan.
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Basis-URL'
+        required: true
+        default: 'https://www.lingeriecaresse.be'
+      max_pages:
+        description: 'Max pagina''s om te bekijken'
+        required: false
+        default: '40'
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, curl
+
+      - name: Verkennen
+        env:
+          BASE: ${{ github.event.inputs.base }}
+          MAXP: ${{ github.event.inputs.max_pages }}
+        run: |
+          cat > /tmp/discover.php <<'PHP'
+          <?php
+          $base = rtrim(getenv('BASE') ?: 'https://www.lingeriecaresse.be', '/');
+          $maxp = (int)(getenv('MAXP') ?: 40);
+          $host = parse_url($base, PHP_URL_HOST);
+          $UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+          function get($url, $UA, &$hdr = null) {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true, CURLOPT_FOLLOWLOCATION=>true,
+              CURLOPT_MAXREDIRS=>5, CURLOPT_TIMEOUT=>25, CURLOPT_USERAGENT=>$UA, CURLOPT_HEADER=>true,
+              CURLOPT_SSL_VERIFYPEER=>false]);
+            $r = curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $hsize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            curl_close($ch);
+            if ($r === false) return [0, '', ''];
+            $hdr = substr($r, 0, $hsize);
+            return [$code, substr($r, $hsize), $hdr];
+          }
+          echo "=== BASIS: $base ===\n";
+          [$code, $html, $hdr] = get($base, $UA);
+          echo "HTTP $code, ".strlen($html)." bytes\n";
+          echo "--- interessante response-headers ---\n";
+          foreach (explode("\n", $hdr) as $l) {
+            if (preg_match('/^(server|x-powered-by|x-generator|via|x-shopify|x-drupal|set-cookie|content-language|x-magento|x-litespeed|cf-|x-wix)/i', trim($l))) echo "  ".trim($l)."\n";
+          }
+          // meta generator / platform-signalen
+          echo "--- platform-signalen in HTML ---\n";
+          foreach ([
+            'WordPress'=>'wp-content|wp-json|wp-includes',
+            'WooCommerce'=>'woocommerce',
+            'Shopify'=>'cdn.shopify|shopify',
+            'PrestaShop'=>'prestashop',
+            'Magento'=>'mage/|Magento',
+            'Wix'=>'wix.com|_wix',
+            'Squarespace'=>'squarespace',
+            'Drupal'=>'drupal',
+            'Joomla'=>'joomla',
+            'Lightspeed/SEOshop'=>'seoshop|lightspeed',
+            'CCV Shop'=>'ccvshop',
+          ] as $name=>$re) {
+            if (preg_match('#'.$re.'#i', $html)) echo "  MOGELIJK: $name\n";
+          }
+          if (preg_match('#<meta[^>]+name=["\']generator["\'][^>]+content=["\']([^"\']+)#i', $html, $m)) echo "  meta generator: $m[1]\n";
+          if (preg_match('#<title[^>]*>(.*?)</title>#is', $html, $m)) echo "title: ".trim(html_entity_decode($m[1]))."\n";
+          // talen (hreflang)
+          echo "--- talen (hreflang) ---\n";
+          if (preg_match_all('#hreflang=["\']([^"\']+)["\']#i', $html, $m)) {
+            echo "  ".implode(', ', array_unique($m[1]))."\n";
+          } else echo "  (geen hreflang gevonden)\n";
+          // stylesheets
+          echo "--- stylesheets ---\n";
+          if (preg_match_all('#<link[^>]+rel=["\']stylesheet["\'][^>]*href=["\']([^"\']+)#i', $html, $m)) {
+            foreach (array_slice(array_unique($m[1]), 0, 15) as $c) echo "  $c\n";
+          }
+          // robots + sitemap
+          echo "=== robots.txt ===\n";
+          [$rc, $robots] = get("$base/robots.txt", $UA);
+          echo substr($robots, 0, 600)."\n";
+          $sitemaps = [];
+          if (preg_match_all('#Sitemap:\s*(\S+)#i', $robots, $m)) $sitemaps = $m[1];
+          if (!$sitemaps) $sitemaps = ["$base/sitemap.xml"];
+          $urls = [];
+          foreach ($sitemaps as $sm) {
+            [$sc, $smx] = get(trim($sm), $UA);
+            if ($sc !== 200) continue;
+            if (preg_match_all('#<loc>\s*([^<]+?)\s*</loc>#i', $smx, $m)) {
+              foreach ($m[1] as $u) {
+                if (preg_match('#\.xml(\.gz)?$#i', $u)) { // sitemap-index
+                  [$c2,$s2] = get(trim($u), $UA);
+                  if ($c2===200 && preg_match_all('#<loc>\s*([^<]+?)\s*</loc>#i', $s2, $mm)) $urls = array_merge($urls, $mm[1]);
+                } else $urls[] = $u;
+              }
+            }
+          }
+          // nav-links van de homepage als er geen sitemap is
+          if (preg_match_all('#href=["\'](https?://'.preg_quote($host,'#').'[^"\']*|/[^"\':#][^"\']*)["\']#i', $html, $m)) {
+            foreach ($m[1] as $u) { $urls[] = (str_starts_with($u,'http')? $u : $base.$u); }
+          }
+          // normaliseren + dedupe, enkel eigen host, geen assets
+          $seen = [];
+          foreach ($urls as $u) {
+            $u = strtok($u, '#'); if (!$u) continue;
+            if (parse_url($u, PHP_URL_HOST) !== $host) continue;
+            if (preg_match('#\.(jpg|jpeg|png|gif|svg|webp|css|js|pdf|ico|woff2?)$#i', $u)) continue;
+            $seen[rtrim($u,'/')] = true;
+          }
+          $pages = array_keys($seen);
+          echo "\n=== PAGINA'S GEVONDEN: ".count($pages)." (toon max $maxp) ===\n";
+          $n = 0;
+          foreach ($pages as $u) {
+            if ($n++ >= $maxp) break;
+            [$c, $h] = get($u, $UA);
+            $t = preg_match('#<title[^>]*>(.*?)</title>#is', $h, $mm) ? trim(html_entity_decode(strip_tags($mm[1]))) : '';
+            $h1 = preg_match('#<h1[^>]*>(.*?)</h1>#is', $h, $mm) ? trim(html_entity_decode(strip_tags($mm[1]))) : '';
+            $imgs = preg_match_all('#<img[^>]+src=#i', $h);
+            $path = parse_url($u, PHP_URL_PATH) ?: '/';
+            printf("  [%3d] %-40s %5db img=%-3d  %s\n", $c, substr($path,0,40), strlen($h), $imgs, substr($t ?: $h1, 0, 50));
+          }
+          echo "\n=== KLAAR ===\n";
+          PHP
+          php /tmp/discover.php
