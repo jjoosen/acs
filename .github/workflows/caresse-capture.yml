@@ -1,0 +1,55 @@
+name: Caresse - site kopiëren (capture)
+
+# Spiegelt www.lingeriecaresse.be (HTML + assets) vanaf de runner naar de branch
+# 'caresse-mirror', zodat we de originele opmaak/CSS/afbeeldingen kunnen inlezen
+# en omzetten naar Sulu-templates. Read-only t.o.v. de live site.
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Basis-URL'
+        required: true
+        default: 'https://www.lingeriecaresse.be'
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mirror met wget
+        env:
+          BASE: ${{ github.event.inputs.base }}
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
+          HOST=$(echo "$BASE" | sed -E 's#https?://##; s#/.*##')
+          rm -rf caresse/mirror && mkdir -p caresse/mirror
+          # homepage + directe requisites (css/js/img/fonts), zelfde host, originele paden
+          wget --recursive --level=2 --page-requisites --no-parent \
+               --no-host-directories --directory-prefix=caresse/mirror \
+               --domains "$HOST" --span-hosts \
+               --adjust-extension --timeout=25 --tries=2 -e robots=off \
+               -U "$UA" "$BASE/" || true
+          # expliciet de bekende CSS/JS-mappen meepakken (voor het geval -p ze mist)
+          for p in css/lingeriecaresse.css css/default.css css/animate.min.css \
+                   fonts/flaticon.css fonts/font-awesome.css fonts/gapicon.css \
+                   include/slick/slick.css include/slick/slick-theme.min.css \
+                   include/fancybox/fancybox.css; do
+            curl -k -s --create-dirs -o "caresse/mirror/$p" -U "$UA" "$BASE/$p" || true
+          done
+          echo "=== overzicht ==="
+          find caresse/mirror -type f | sort | head -200
+          echo "=== totaal bestanden: $(find caresse/mirror -type f | wc -l) ==="
+          du -sh caresse/mirror || true
+
+      - name: Commit naar branch caresse-mirror
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout -B caresse-mirror
+          git add -f caresse/mirror
+          git commit -m "Caresse: mirror van www.lingeriecaresse.be (HTML + assets)" || echo "niets te committen"
+          git push -f origin caresse-mirror
