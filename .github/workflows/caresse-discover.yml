@@ -60,20 +60,26 @@ jobs:
           foreach ([
             'WordPress'=>'wp-content|wp-json|wp-includes',
             'WooCommerce'=>'woocommerce',
-            'Shopify'=>'cdn.shopify|shopify',
+            'Shopify'=>'cdn\.shopify|Shopify\.',
             'PrestaShop'=>'prestashop',
-            'Magento'=>'mage/|Magento',
-            'Wix'=>'wix.com|_wix',
+            'Magento 1'=>'/skin/frontend/|Mage\.Cookies|var/view_preprocessed',
+            'Magento 2'=>'/static/version|mage/requirejs|Magento_',
+            'Wix'=>'wix\.com|_wixCssStates',
             'Squarespace'=>'squarespace',
-            'Drupal'=>'drupal',
-            'Joomla'=>'joomla',
-            'Lightspeed/SEOshop'=>'seoshop|lightspeed',
+            'Drupal'=>'Drupal\.settings|/sites/default/files',
+            'Joomla'=>'/media/jui/|Joomla',
+            'Lightspeed/SEOshop'=>'seoshop|lightspeedhq',
             'CCV Shop'=>'ccvshop',
+            'Typo3'=>'typo3',
+            'Webflow'=>'webflow',
           ] as $name=>$re) {
             if (preg_match('#'.$re.'#i', $html)) echo "  MOGELIJK: $name\n";
           }
           if (preg_match('#<meta[^>]+name=["\']generator["\'][^>]+content=["\']([^"\']+)#i', $html, $m)) echo "  meta generator: $m[1]\n";
           if (preg_match('#<title[^>]*>(.*?)</title>#is', $html, $m)) echo "title: ".trim(html_entity_decode($m[1]))."\n";
+          echo "--- HEAD (eerste 2200 tekens) ---\n";
+          $headHtml = preg_match('#<head\b.*?</head>#is', $html, $mh) ? $mh[0] : substr($html,0,2200);
+          echo substr(preg_replace('#\s+#',' ', $headHtml), 0, 2200)."\n";
           // talen (hreflang)
           echo "--- talen (hreflang) ---\n";
           if (preg_match_all('#hreflang=["\']([^"\']+)["\']#i', $html, $m)) {
@@ -81,9 +87,9 @@ jobs:
           } else echo "  (geen hreflang gevonden)\n";
           // stylesheets
           echo "--- stylesheets ---\n";
-          if (preg_match_all('#<link[^>]+rel=["\']stylesheet["\'][^>]*href=["\']([^"\']+)#i', $html, $m)) {
+          if (preg_match_all('#<link[^>]+href=["\']([^"\']+\.css[^"\']*)["\']#i', $html, $m)) {
             foreach (array_slice(array_unique($m[1]), 0, 15) as $c) echo "  $c\n";
-          }
+          } else echo "  (geen .css links gevonden)\n";
           // robots + sitemap
           echo "=== robots.txt ===\n";
           [$rc, $robots] = get("$base/robots.txt", $UA);
@@ -104,9 +110,14 @@ jobs:
               }
             }
           }
-          // nav-links van de homepage als er geen sitemap is
-          if (preg_match_all('#href=["\'](https?://'.preg_quote($host,'#').'[^"\']*|/[^"\':#][^"\']*)["\']#i', $html, $m)) {
-            foreach ($m[1] as $u) { $urls[] = (str_starts_with($u,'http')? $u : $base.$u); }
+          // interne links van de homepage (delimiter ~ zodat # in de class mag)
+          if (preg_match_all('~href=["\']([^"\']+)["\']~i', $html, $m)) {
+            foreach ($m[1] as $u) {
+              $u = trim($u);
+              if ($u === '' || $u[0] === '#' || str_starts_with($u, 'mailto:') || str_starts_with($u, 'tel:') || str_starts_with($u, 'javascript:')) continue;
+              if (str_starts_with($u, 'http')) { if (parse_url($u, PHP_URL_HOST) === $host) $urls[] = $u; }
+              elseif ($u[0] === '/') { $urls[] = $base.$u; }
+            }
           }
           // normaliseren + dedupe, enkel eigen host, geen assets
           $seen = [];
