@@ -1,0 +1,187 @@
+{# Lingerie Caresse — één-pagina brochure, geport van www.lingeriecaresse.be
+   naar een Sulu-webspace (key: aernouts). Assets onder /caresse/. Teksten zijn
+   bewerkbaar via de CMS (content.*) met de originele inhoud als standaard. #}
+{% set subtitle     = content.subtitle|default('Lingerie, badmode & nachtmode') %}
+{% set phoneDisplay = content.phone_display|default('+32 (0)3 475 19 24') %}
+{% set phoneLink    = content.phone_link|default('003234751924') %}
+{% set email        = content.email|default('info@lingeriecaresse.be') %}
+{% set facebookUrl  = content.facebook_url|default('https://www.facebook.com/Lingerie-Caresse-231037150349095/') %}
+{% set webshopUrl   = content.webshop_url|default('https://shop.lingeriecaresse.be') %}
+<!DOCTYPE html>
+<html class="not-ie" lang="nl">
+<head>
+    <meta charset="utf-8">
+    <title>Lingerie Caresse Ranst - Lingerie, badmode &amp; nachtmode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="robots" content="noindex, nofollow"/>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/caresse/images/fav/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/caresse/images/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/caresse/images/fav/favicon-16x16.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="description" content="Bij Lingerie Caresse te Ranst vindt u een groot aanbod aan lingerie, badmode &amp; nachtmode."/>
+    <meta property="og:title" content="Lingerie Caresse Ranst - Lingerie, badmode &amp; nachtmode"/>
+    <meta property="og:image" content="/caresse/images/logo-rood.png"/>
+    <meta property="og:description" content="Bij Lingerie Caresse te Ranst vindt u een groot aanbod aan lingerie, badmode &amp; nachtmode."/>
+
+    <link href="/caresse/css/lingeriecaresse.css" rel="stylesheet" type="text/css"/>
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Cookiebanner (origineel) -->
+    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/e54dc1f563e6fd2d107929d4f1a0568a/script.js"></script>
+</head>
+<body>
+<div class="header-wrapper" style="background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(/caresse/images/header.JPG) center center; background-size: cover;">
+    <div class="contact-button">
+        <a href="tel:{{ phoneLink }}" class="contact-button-wrapper">
+            <div class="text sec-font">{{ phoneDisplay }}</div>
+            <div class="icon"><i class="fa-phone"></i></div>
+            <div class="clear"></div>
+        </a>
+    </div>
+    <div class="facebook-button">
+        <a href="{{ facebookUrl }}" target="_blank" class="facebook-button-wrapper">
+            <div class="text sec-font">Facebook</div>
+            <div class="icon"><i class="fa-facebook"></i></div>
+            <div class="clear"></div>
+        </a>
+    </div>
+    <div class="logo">
+        <img src="/caresse/images/logo-rood.png" alt="Lingerie Caresse" class="animated" data-animation="fadeInDown" data-animation-delay="200"/>
+        <span class="subtitle animated" data-animation="fadeInUp" data-animation-delay="1000">{{ subtitle }}</span>
+        <div class="webshop-button">
+            <a href="{{ webshopUrl }}" class="btn btn--pill btn--h-normal btn--webshop">
+                <div class="text sec-font">webshop</div>
+            </a>
+        </div>
+    </div>
+    <a href="#detail-wrapper" class="scroll-image">
+        <i class="gapicon-Mouse"></i>
+        <div class="title">Scroll</div>
+    </a>
+</div>
+
+<div class="detail-wrapper" id="detail-wrapper">
+    <div class="detail-item animated" data-animation="fadeIn" data-animation-delay="0">
+        <div class="content left"><h3><div class="title">Lingerie</div></h3></div>
+        <div class="image right" style="background-image: url('/caresse/images/fotos/lingerie/IMG_2170.JPG')">
+            <div style="background-image: url('/caresse/images/fotos/lingerie/IMG_2170.JPG')"></div>
+            <div style="background-image: url('/caresse/images/fotos/lingerie/IMG_2183.JPG')"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="detail-item animated" data-animation="fadeIn" data-animation-delay="0">
+        <div class="content right"><h3><div class="title">Badmode</div></h3></div>
+        <div class="image left" style="background-image: url('/caresse/images/fotos/badmode/IMG_2142.JPG')">
+            <div style="background-image: url('/caresse/images/fotos/badmode/IMG_2142.JPG')"></div>
+            <div style="background-image: url('/caresse/images/fotos/badmode/IMG_2148.JPG')"></div>
+            <div style="background-image: url('/caresse/images/fotos/badmode/IMG_2208.JPG')"></div>
+            <div style="background-image: url('/caresse/images/fotos/badmode/IMG_2359.JPG')"></div>
+            <div style="background-image: url('/caresse/images/fotos/badmode/IMG_2398.JPG')"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="detail-item animated" data-animation="fadeIn" data-animation-delay="0">
+        <div class="content left"><h3><div class="title">Nachtmode</div></h3></div>
+        <div class="image right" style="background-image: url('/caresse/images/fotos/nachtmode/IMG_2376%20kopie.JPG')">
+            <div style="background-image: url('/caresse/images/fotos/nachtmode/IMG_2376%20kopie.JPG')"></div>
+            <div style="background-image: url('/caresse/images/fotos/nachtmode/IMG_2383.JPG')"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="merken-wrapper" id="merken-wrapper">
+    {% for img in [
+        'IMG_2401.JPG','IMG_2402.PNG','IMG_2403.JPG','IMG_2404.JPG','IMG_2405.PNG','IMG_2406.JPG',
+        'IMG_2407.JPG','IMG_2408.JPG','IMG_2409.PNG','IMG_2410.JPG','IMG_2411.PNG','IMG_2412.JPG',
+        'IMG_2413.JPG','IMG_2414.JPG','IMG_2415.PNG','IMG_2416.PNG','IMG_2417.PNG','IMG_2418.JPG',
+        'IMG_2420.PNG','IMG_2421.PNG','IMG_2422.PNG','IMG_2423.PNG','IMG_2424.JPG','IMG_2425.JPG','IMG_2426.JPG'
+    ] %}
+        <div class="slide" style="background-image: url('/caresse/images/fotos/merken/{{ img }}')"></div>
+    {% endfor %}
+</div>
+
+<div class="main-wrapper">
+    <div class="container">
+        <div class="specialiteiten space-bottom opmerkingen">
+            <h2>
+                <div class="subtitle">vragen of opmerkingen?</div>
+                <div class="title">neem gerust contact op!</div>
+            </h2>
+        </div>
+
+        <div class="contact-info">
+            <div class="contact-detail animated" data-animation="fadeInDown" data-animation-delay="0">
+                <div class="subtitle">Openingsuren</div>
+                <div class="title">
+                    {% if content.opening_hours|default %}{{ content.opening_hours|raw }}{% else %}
+                    ZON en MA gesloten<br /><br />
+                    DI: doorlopend<br />10u30-16u30<br /><br />
+                    WO-VRIJ: <br />9u30-12u30 en 13u30-18u<br /><br />
+                    ZA doorlopend 10-17u
+                    {% endif %}
+                </div>
+            </div>
+            <div class="contact-detail animated" data-animation="fadeInDown" data-animation-delay="0">
+                <div class="subtitle">adres</div>
+                <div class="title">{% if content.address|default %}{{ content.address|raw }}{% else %}Gasthuisstraat 2,<br>2520 Ranst{% endif %}</div>
+            </div>
+            <a href="tel:{{ phoneLink }}" class="contact-detail animated" data-animation="fadeInDown" data-animation-delay="200">
+                <div class="subtitle">telefoon</div>
+                <div class="title">{{ phoneDisplay }}</div>
+            </a>
+            <a href="mailto:{{ email }}" class="contact-detail animated" data-animation="fadeInDown" data-animation-delay="400">
+                <div class="subtitle">e-mailadres</div>
+                <div class="title">{{ email }}</div>
+            </a>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="note">Wij beheren gegevens volgens de <a class="privacy showprivacypolicy" href="#privacy-policy">privacy policy</a></div>
+</div>
+
+<div class="privacy-policy privacy-policyPopup" id="privacy-policy">
+    <button class="closeBtn"><i class="fa fa-times"></i></button>
+    <h1 class="title">Privacy policy</h1>
+    {% if content.privacy_policy|default %}{{ content.privacy_policy|raw }}{% else %}{% include 'pages/caresse/_privacy_default.html.twig' %}{% endif %}
+</div>
+
+<a href="https://www.google.com/maps/place/Gasthuisstraat+2,+2520+Ranst/@51.1895261,4.5589615,15z" target="_blank" class="map animated" data-animation="fadeIn" data-animation-delay="0"></a>
+
+<div class="footer">
+    <div class="container">
+        <div class="left">
+            Copyright &copy; Lingerie Caresse {{ "now"|date("Y") }}<span class="hidefrom750"> | </span> <a href="#cookie-policy" class="cookie showcookiepolicy">cookie policy</a>
+        </div>
+        <div class="right">
+            website door <a class="green" href="https://www.innomedio.be" target="blank">innomedio</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="cookie-policy" id="cookie-policy">
+    <button class="closeBtn"><i class="fa fa-times"></i></button>
+    <h1 class="title">Cookie policy</h1>
+    {% if content.cookie_policy|default %}{{ content.cookie_policy|raw }}{% else %}{% include 'pages/caresse/_cookie_default.html.twig' %}{% endif %}
+</div>
+
+<link href="/caresse/css/default.css" rel="stylesheet" type="text/css"/>
+<link href="/caresse/css/animate.min.css" rel="stylesheet" type="text/css"/>
+<link href="/caresse/fonts/flaticon.css" rel="stylesheet"/>
+<link href="/caresse/fonts/font-awesome.css" rel="stylesheet"/>
+<link href="/caresse/fonts/gapicon.css" rel="stylesheet"/>
+<link href="/caresse/include/fancybox/fancybox.css" rel="stylesheet" type="text/css"/>
+<link href="/caresse/include/slick/slick.css" rel="stylesheet" type="text/css"/>
+<link href="/caresse/include/slick/slick-theme.min.css" rel="stylesheet" type="text/css"/>
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,300italic,200,600,700,900' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript" src="/caresse/include/slick/slick.js"></script>
+<script type="text/javascript" src="/caresse/include/fancybox/fancybox.js"></script>
+<script type="text/javascript" src="/caresse/include/waypoints.js"></script>
+<script type="text/javascript" src="/caresse/include/jquery_general.js"></script>
+</body>
+</html>
