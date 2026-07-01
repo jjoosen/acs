@@ -68,7 +68,7 @@ jobs:
             --exclude='.git' --exclude='node_modules' \
             --exclude='var' --exclude='.env.local' \
             --exclude='upload' --exclude='public/uploads' \
-            --exclude='.nfs*' \
+            --exclude='.nfs*' --exclude='aernouts' --exclude='caresse' \
             -e "$RSH" \
             ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:acs/" || true
 

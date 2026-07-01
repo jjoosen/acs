@@ -1,0 +1,21 @@
+# Combell-webhosting (vaste docroot): de volledige app staat in de docroot,
+# maar de site moet via Symfony's front controller in public/ draaien.
+#
+# - Bestaande bestanden in public/ (css, js, afbeeldingen, ...) rechtstreeks serveren.
+# - Alle overige verzoeken (incl. /admin) naar public/index.php sturen.
+# Zo zijn config/, src/, vendor/ niet bereikbaar en werkt de routing volledig.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Echte bestanden onder public/ rechtstreeks afleveren.
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Al de rest via de Symfony front controller.
+    RewriteRule ^ public/index.php [L]
+</IfModule>
+
+<IfModule mod_dir.c>
+    DirectoryIndex public/index.php
+</IfModule>

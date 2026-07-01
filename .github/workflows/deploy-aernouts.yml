@@ -1,0 +1,80 @@
+name: Deploy aernouts (Lingerie Caresse)
+
+# Zelfstandige Sulu-app in ./aernouts -> ~/aernouts op hetzelfde Combell-account.
+# Los van ACS. Docroot van aernouts.goldeneye.digital moet naar ~/aernouts/public
+# wijzen (in Combell in te stellen). Handmatig te starten.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aernouts
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: aernouts
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP opzetten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, mbstring, pdo_sqlite, gd, zip, xml, fileinfo, exif
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: SSH voorbereiden
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          if [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+          fi
+
+      - name: Rsync naar server (~/aernouts)
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
+          $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "mkdir -p aernouts" || true
+          rsync -az --delete --no-perms --omit-dir-times --ignore-errors \
+            --exclude='.git' --exclude='node_modules' \
+            --exclude='var' --exclude='.env.local' \
+            --exclude='public/uploads' --exclude='.nfs*' \
+            -e "$RSH" \
+            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:aernouts/" || true
+
+      - name: Remote deploy-stappen
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=20 -o ServerAliveCountMax=60"
+          $RSH "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "DEPLOY_PATH='aernouts' PHP_BIN='${{ secrets.PHP_BIN }}' bash -s" < deploy/remote-deploy.sh
+
+      - name: Healthcheck
+        continue-on-error: true
+        run: |
+          BASE="https://aernouts.goldeneye.digital"
+          CB="cb=$(date +%s)$RANDOM"
+          echo "=== OPcache reset (FPM) ==="
+          curl -k -s --max-time 20 "$BASE/_oc.php?t=acs-oc-7Yq2"; echo
+          sleep 2
+          for path in "/" "/admin/"; do
+            code=$(curl -k -s -o /tmp/b -w "%{http_code}" -L --max-time 30 "$BASE$path?$CB" || echo 000)
+            echo ">>> $path -> HTTP $code (bytes=$(wc -c </tmp/b))"
+          done
+          echo "=== homepage-check ==="
+          HTML=$(curl -k -s -L --max-time 30 "$BASE/?$CB")
+          echo "  title: $(printf '%s' "$HTML" | grep -oE '<title>[^<]*' | head -1)"
+          echo "  secties: header=$(printf '%s' "$HTML" | grep -c header-wrapper) detail=$(printf '%s' "$HTML" | grep -c 'detail-item') slides=$(printf '%s' "$HTML" | grep -oc 'class="slide"')"
+          echo "  assets-verwijzingen: css=$(printf '%s' "$HTML" | grep -c '/css/lingeriecaresse.css') logo=$(printf '%s' "$HTML" | grep -c 'logo-rood.png')"
+          echo "  /css bereikbaar: $(curl -k -s -o /dev/null -w '%{http_code}' --max-time 20 "$BASE/css/lingeriecaresse.css")"
+          echo "  /images/header.JPG: $(curl -k -s -o /dev/null -w '%{http_code}' --max-time 20 "$BASE/images/header.JPG")"
